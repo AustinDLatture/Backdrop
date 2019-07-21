@@ -70,7 +70,7 @@ class HomeState extends State<MapPage> {
         body: Column(
           children: <Widget>[
             Container(
-              child: SizedBox(
+              child: SizedBox(            
                   height: 200.0,
                   child: GoogleMap(
                       onMapCreated: _onMapCreated,
@@ -79,9 +79,25 @@ class HomeState extends State<MapPage> {
                           cameraPosition:
                               const CameraPosition(target: LatLng(0.0, 0.0))))),
             ),
-            Expanded(child: expandedChild)
+            Expanded(child: expandedChild),
+            Container(
+              decoration: new BoxDecoration(
+                border: new Border.all(color: Colors.blueAccent),
+                borderRadius: BorderRadius.all(Radius.circular(10))
+              ),
+              child: SizedBox(
+                height: 215.0,
+                width: 385.0
+              ),
+            ),
+            Container(
+              child: SizedBox(
+                height: 20.0,                
+            )
+            ) 
           ],
-        ));
+        )
+        );
   }
  
   void refresh() async {
@@ -194,16 +210,6 @@ class HomeState extends State<MapPage> {
         ));
       }
  
-      if (f.vicinity != null) {
-        list.add(Padding(
-          padding: EdgeInsets.only(bottom: 2.0),
-          child: Text(
-            f.vicinity,
-            style: Theme.of(context).textTheme.body1,
-          ),
-        ));
-      }
- 
       if (f.types?.first != null) {
         list.add(Padding(
           padding: EdgeInsets.only(bottom: 2.0),
@@ -215,8 +221,11 @@ class HomeState extends State<MapPage> {
       }
  
       return Padding(
-        padding: EdgeInsets.only(top: 4.0, bottom: 4.0, left: 8.0, right: 8.0),
+        padding: EdgeInsets.only(top: 1.0, bottom: 1.0, left: 8.0, right: 8.0),
         child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))
+          ),
           child: InkWell(
             onTap: () {
               showDetailPlace(f.placeId);
@@ -224,7 +233,7 @@ class HomeState extends State<MapPage> {
             highlightColor: Colors.lightBlueAccent,
             splashColor: Colors.red,
             child: Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(2.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
