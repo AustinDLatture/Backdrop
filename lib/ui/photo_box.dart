@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -5,20 +6,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 const kGoogleApiKey = "AIzaSyBSN2njU9C-NnWUUlDzSiljSy6AViPCEMk";
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
 
-class PlaceDetailWidget extends StatefulWidget {
+class PhotoBox extends StatefulWidget {
   String placeId;
 
-  PlaceDetailWidget(String placeId) {
+  PhotoBox(String placeId) {
     this.placeId = placeId;
   }
 
   @override
   State<StatefulWidget> createState() {
-    return PlaceDetailState();
+    return new PhotoBoxState();
   }
 }
 
-class PlaceDetailState extends State<PlaceDetailWidget> {
+class PhotoBoxState extends State<PhotoBox> {
   GoogleMapController mapController;
   PlacesDetailsResponse place;
   bool isLoading = false;
@@ -50,8 +51,8 @@ class PlaceDetailState extends State<PlaceDetailWidget> {
       final placeDetail = place.result;
       title = placeDetail.name;
       bodyChild = Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Expanded(
             child: buildPlaceDetailList(placeDetail),
@@ -59,13 +60,11 @@ class PlaceDetailState extends State<PlaceDetailWidget> {
         ],
       );
     }
-
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.grey,
-          title: Text(title),
-        ),
-        body: bodyChild);
+    return new Container(
+      height: 150.0,
+      width: MediaQuery.of(context).size.width,
+      child: bodyChild
+      );      
   }
 
   void fetchPlaceDetail() async {
@@ -98,7 +97,7 @@ class PlaceDetailState extends State<PlaceDetailWidget> {
     if (placeDetail.photos != null) {
       final photos = placeDetail.photos;
       list.add(SizedBox(
-          height: 100.0,
+          height: 145.0,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: photos.length,

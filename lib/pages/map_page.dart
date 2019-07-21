@@ -4,24 +4,27 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as LocationManager;
-import 'place_detail.dart';
+import '../ui/photo_box.dart';
  
 const kGoogleApiKey = "AIzaSyBSN2njU9C-NnWUUlDzSiljSy6AViPCEMk";
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
+String placeId;
  
 class MapPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return HomeState();
+    return MapPageState();
   }
 }
  
-class HomeState extends State<MapPage> {
+class MapPageState extends State<MapPage> {
   final homeScaffoldKey = GlobalKey<ScaffoldState>();
   GoogleMapController mapController;
   List<PlacesSearchResult> places = [];
   bool isLoading = false;
   String errorMessage;
+  bool _pressed = false;
+  String _placeId;
  
   @override
   Widget build(BuildContext context) {
@@ -37,72 +40,62 @@ class HomeState extends State<MapPage> {
     }
  
     return Scaffold(
-        key: homeScaffoldKey,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: const Text(
-            "Backdrops Nearby",
-            style: TextStyle(color: Colors.grey)
-            ),
-          actions: <Widget>[
-            isLoading
-                ? IconButton(
-                    color: Colors.grey,
-                    icon: Icon(Icons.timer),
-                    onPressed: () {},
-                  )
-                : IconButton(
-                    color: Colors.grey,
-                    icon: Icon(Icons.refresh),
-                    onPressed: () {
-                      refresh();
-                    },
-                  ),
-            IconButton(
-              color: Colors.grey,
-              icon: Icon(Icons.search),
-              onPressed: () {
-                _handlePressButton();
-              },
-            ),
-          ],
-        ),
-        body: Column(
-          children: <Widget>[
-            Container(
-              child: SizedBox(            
-                  height: 200.0,
-                  child: GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      options: GoogleMapOptions(
-                          myLocationEnabled: true,
-                          cameraPosition:
-                              const CameraPosition(target: LatLng(0.0, 0.0))))),
-            ),
-            Expanded(child: expandedChild),
-            Container(
-              decoration: new BoxDecoration(
-                border: new Border.all(color: Colors.blueAccent),
-                borderRadius: BorderRadius.all(Radius.circular(10))
-              ),
-              child: SizedBox(
-                height: 215.0,
-                width: 385.0
-              ),
-            ),
-            Container(
-              child: SizedBox(
-                height: 20.0,                
-            )
-            ) 
-          ],
-        )
-        );
+      key: homeScaffoldKey,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Nearby Backdrops",
+          style: TextStyle(color: Colors.grey)
+          ),
+        actions: <Widget>[
+          isLoading
+              ? IconButton(
+                  color: Colors.grey,
+                  icon: Icon(Icons.timer),
+                  onPressed: () {},
+                )
+              : IconButton(
+                  color: Colors.grey,
+                  icon: Icon(Icons.refresh),
+                  onPressed: () {
+                    refresh();
+                  },
+                ),
+          IconButton(
+            color: Colors.grey,
+            icon: Icon(Icons.search),
+            onPressed: () {
+              _handlePressButton();
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          Container(
+            child: SizedBox(            
+                height: 260.0,
+                child: GoogleMap(
+                    onMapCreated: _onMapCreated,
+                    options: GoogleMapOptions(
+                        myLocationEnabled: true,
+                        cameraPosition:
+                            const CameraPosition(target: LatLng(0.0, 0.0))))),
+          ),
+          _pressed 
+          ? new Builder(builder: (BuildContext context) { return PhotoBox(_placeId); }) 
+          : new SizedBox(),
+          Expanded(child: expandedChild),         
+          Container( //Padding at bottom             
+            height: 20.0,                          
+          ) 
+        ],
+      )
+    );
   }
  
   void refresh() async {
     final center = await getUserLocation();
- 
     mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         target: center == null ? LatLng(0, 0) : center, zoom: 15.0)));
     getNearbyPlaces(center);
@@ -128,7 +121,76 @@ class HomeState extends State<MapPage> {
     }
   }
  
-  void getNearbyPlaces(LatLng center) async {
+  void showPhotoBox(String placeId) {
+    bool newPlacePressed = false;
+    if (placeId != null) {
+      if (_placeId != placeId) {
+        newPlacePressed = true;
+        _placeId = placeId;              
+      }
+      setState(() {
+        _placeId = placeId;
+        _pressed = newPlacePressed;
+      });
+    }
+  }
+ 
+  ListView buildPlacesList() {
+    final placesWidget = places.map((f) {
+      List<Widget> list = [
+        Padding(
+          padding: EdgeInsets.only(bottom: 4.0),
+          child: Text(
+            f.name,
+            style: Theme.of(context).textTheme.subtitle,
+          ),
+        )
+      ];
+      if (f.formattedAddress != null) {
+        list.add(Padding(
+          padding: EdgeInsets.only(bottom: 2.0),
+          child: Text(
+            f.formattedAddress,
+          ),
+        ));
+      }
+      if (f.vicinity != null) {
+        list.add(Padding(
+          padding: EdgeInsets.only(bottom: 2.0),
+          child: Text(
+            f.vicinity,
+          ),
+        ));
+      }
+      return Padding(
+        padding: EdgeInsets.only(top: 1.0, bottom: 1.0, left: 8.0, right: 8.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))
+          ),
+          child: InkWell(
+            onTap: () {
+              showPhotoBox(f.placeId);
+            },
+            highlightColor: Colors.lightBlueAccent,
+            splashColor: Colors.blueAccent,
+            child: Padding(
+              padding: EdgeInsets.all(2.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: list,
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
+ 
+    return ListView(shrinkWrap: true, children: placesWidget);
+  }
+  
+    void getNearbyPlaces(LatLng center) async {
     setState(() {
       this.isLoading = true;
       this.errorMessage = null;
@@ -158,11 +220,11 @@ class HomeState extends State<MapPage> {
       SnackBar(content: Text(response.errorMessage)),
     );
   }
- 
+
   Future <void> _handlePressButton() async {
     try {
       final center = await getUserLocation();
-      Prediction p = await PlacesAutocomplete.show(
+      Prediction p = await PlacesAutocomplete.show(       
           context: context,
           strictbounds: center == null ? false : true,
           apiKey: kGoogleApiKey,
@@ -173,78 +235,11 @@ class HomeState extends State<MapPage> {
               ? null
               : Location(center.latitude, center.longitude),
           radius: center == null ? null : 10000);
- 
-      showDetailPlace(p.placeId);
+          print("handlePressButton");
+          
+      showPhotoBox(p.placeId);
     } catch (e) {
       return;
     }
-  }
- 
-  Future <Null> showDetailPlace(String placeId) async {
-    if (placeId != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PlaceDetailWidget(placeId)),
-      );
-    }
-  }
- 
-  ListView buildPlacesList() {
-    final placesWidget = places.map((f) {
-      List<Widget> list = [
-        Padding(
-          padding: EdgeInsets.only(bottom: 4.0),
-          child: Text(
-            f.name,
-            style: Theme.of(context).textTheme.subtitle,
-          ),
-        )
-      ];
-      if (f.formattedAddress != null) {
-        list.add(Padding(
-          padding: EdgeInsets.only(bottom: 2.0),
-          child: Text(
-            f.formattedAddress,
-            style: Theme.of(context).textTheme.subtitle,
-          ),
-        ));
-      }
- 
-      if (f.types?.first != null) {
-        list.add(Padding(
-          padding: EdgeInsets.only(bottom: 2.0),
-          child: Text(
-            f.types.first,
-            style: Theme.of(context).textTheme.caption,
-          ),
-        ));
-      }
- 
-      return Padding(
-        padding: EdgeInsets.only(top: 1.0, bottom: 1.0, left: 8.0, right: 8.0),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))
-          ),
-          child: InkWell(
-            onTap: () {
-              showDetailPlace(f.placeId);
-            },
-            highlightColor: Colors.lightBlueAccent,
-            splashColor: Colors.red,
-            child: Padding(
-              padding: EdgeInsets.all(2.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: list,
-              ),
-            ),
-          ),
-        ),
-      );
-    }).toList();
- 
-    return ListView(shrinkWrap: true, children: placesWidget);
   }
 }
