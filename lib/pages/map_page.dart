@@ -72,10 +72,10 @@ class MapPageState extends State<MapPage> {
       ),
       body: Column(
         children: <Widget>[
-          Container(
+          Container(            
             child: SizedBox(            
                 height: 260.0,
-                child: GoogleMap(
+                child: GoogleMap(                  
                     onMapCreated: _onMapCreated,
                     options: GoogleMapOptions(
                         myLocationEnabled: true,
@@ -83,22 +83,15 @@ class MapPageState extends State<MapPage> {
                             const CameraPosition(target: LatLng(0.0, 0.0))))),
           ),
           _pressed 
-          ? new Builder(builder: (BuildContext context) { return PhotoBox(_placeId); }) 
+          ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
           : new SizedBox(),
           Expanded(child: expandedChild),         
           Container( //Padding at bottom             
-            height: 20.0,                          
+            height: 30.0,                          
           ) 
         ],
       )
     );
-  }
- 
-  void refresh() async {
-    final center = await getUserLocation();
-    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: center == null ? LatLng(0, 0) : center, zoom: 15.0)));
-    getNearbyPlaces(center);
   }
  
   void _onMapCreated(GoogleMapController controller) async {
@@ -120,17 +113,18 @@ class MapPageState extends State<MapPage> {
       return null;
     }
   }
+    void refresh() async {
+    final center = await getUserLocation();
+    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: center == null ? LatLng(0, 0) : center, zoom: 15.0)));
+    getNearbyPlaces(center);
+  }
  
   void showPhotoBox(String placeId) {
-    bool newPlacePressed = false;
-    if (placeId != null) {
-      if (_placeId != placeId) {
-        newPlacePressed = true;
-        _placeId = placeId;              
-      }
+    if (placeId != _placeId) {
       setState(() {
         _placeId = placeId;
-        _pressed = newPlacePressed;
+        _pressed = true;
       });
     }
   }

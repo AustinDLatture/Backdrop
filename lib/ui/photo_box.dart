@@ -51,8 +51,6 @@ class PhotoBoxState extends State<PhotoBox> {
       final placeDetail = place.result;
       title = placeDetail.name;
       bodyChild = Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Expanded(
             child: buildPlaceDetailList(placeDetail),
