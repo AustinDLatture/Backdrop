@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:backdrop/pages/map_page.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter/material.dart';
@@ -15,82 +18,77 @@ class PhotoBox extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new PhotoBoxState();
+    return PhotoBoxState();
   }
 }
 
 class PhotoBoxState extends State<PhotoBox> {
   GoogleMapController mapController;
   PlacesDetailsResponse place;
-  bool isLoading = false;
-  String errorLoading;
-
+  PlaceDetails placeDetails;
+  Future<PlacesDetailsResponse> _place;
+  
   @override
   void initState() {
-    fetchPlaceDetail();
     super.initState();
+    _place = fetchPlaceDetail();
+  }
+
+  @override
+  void didUpdateWidget(PhotoBox oldPhotoBox) {
+    if (oldPhotoBox.placeId != widget.placeId) {
+      _place = fetchPlaceDetail();
+    }
+    super.didUpdateWidget(oldPhotoBox);
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget bodyChild;
-    String title;
-    if (isLoading) {
-      title = "Loading";
-      bodyChild = Center(
-        child: CircularProgressIndicator(
-          value: null,
-        ),
-      );
-    } else if (errorLoading != null) {
-      title = "";
-      bodyChild = Center(
-        child: Text(errorLoading),
-      );
-    } else {
-      final placeDetail = place.result;
-      title = placeDetail.name;
-      bodyChild = Column(
-        children: <Widget>[
-          Expanded(
-            child: buildPlaceDetailList(placeDetail),
-          )
-        ],
-      );
-    }
-    return new Container(
-      height: 150.0,
-      width: MediaQuery.of(context).size.width,
-      child: bodyChild
-      );      
+    return new FutureBuilder(
+      future: _place,
+      builder: (BuildContext context, AsyncSnapshot<PlacesDetailsResponse> snapshot) {
+        switch(snapshot.connectionState) {
+          case ConnectionState.none:
+            return new Text('No photos');
+          case ConnectionState.waiting:
+            return new CircularProgressIndicator();
+          case ConnectionState.active:            
+            return new CircularProgressIndicator();
+          case ConnectionState.done:
+            return new Container(
+              height: 150.0,
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: buildPhotoList(this.placeDetails),
+                    )
+                  ],
+                )
+              ); 
+        }
+      }
+    );
+       
   }
 
-  void fetchPlaceDetail() async {
-    setState(() {
-      this.isLoading = true;
-      this.errorLoading = null;
-    });
-
+  Future<PlacesDetailsResponse> fetchPlaceDetail() async {
     PlacesDetailsResponse place =
         await _places.getDetailsByPlaceId(widget.placeId);
-
-    if (mounted) {
-      setState(() {
-        this.isLoading = false;
-        if (place.status == "OK") {
-          this.place = place;
-        } else {
-          this.errorLoading = place.errorMessage;
+        if (place.status == 'OK') {
+          setState((){
+            this.place = place;
+            this.placeDetails = place.result;
+          });
         }
-      });
-    }
+    return place;
   }
 
   String buildPhotoURL(String photoReference) {
     return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${kGoogleApiKey}";
   }
 
-  ListView buildPlaceDetailList(PlaceDetails placeDetail) {
+  ListView buildPhotoList(PlaceDetails placeDetail) {
     List<Widget> list = [];
     if (placeDetail.photos != null) {
       final photos = placeDetail.photos;
