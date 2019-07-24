@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as LocationManager;
 import '../ui/photo_box.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter/services.dart';
  
 const kGoogleApiKey = "AIzaSyBSN2njU9C-NnWUUlDzSiljSy6AViPCEMk";
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
@@ -28,9 +30,13 @@ class MapPageState extends State<MapPage> {
  
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
     Widget expandedChild;
     if (isLoading) {
-      expandedChild = Center(child: CircularProgressIndicator(value: null));
+      expandedChild = Center(child: SpinKitWave(color: Colors.blueAccent, type: SpinKitWaveType.center));
     } else if (errorMessage != null) {
       expandedChild = Center(
         child: Text(errorMessage),
@@ -41,6 +47,7 @@ class MapPageState extends State<MapPage> {
  
     return Scaffold(
       key: homeScaffoldKey,
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text(
@@ -68,13 +75,21 @@ class MapPageState extends State<MapPage> {
               _handlePressButton();
             },
           ),
+          IconButton(
+            color: Colors.green[300],
+            icon: Icon(Icons.pageview),
+            iconSize: 40.0,
+            onPressed: () {
+              //Open advanced search
+            },
+          ),
         ],
       ),
       body: Column(
         children: <Widget>[
           Container(            
             child: SizedBox(            
-                height: 260.0,
+                height: 330.0,
                 child: GoogleMap(                  
                     onMapCreated: _onMapCreated,
                     options: GoogleMapOptions(
@@ -85,10 +100,7 @@ class MapPageState extends State<MapPage> {
           _pressed 
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
           : new SizedBox(),
-          Expanded(child: expandedChild),         
-          Container( //Padding at bottom             
-            height: 30.0,                          
-          ) 
+          Expanded(child: expandedChild)
         ],
       )
     );
@@ -115,8 +127,11 @@ class MapPageState extends State<MapPage> {
   }
     void refresh() async {
     final center = await getUserLocation();
+    //Hacky workaround to center the camera. 
+    //TODO: Check for the resolution to this bug in Google Maps iOS SDK
+    mapController.moveCamera(CameraUpdate.newLatLng(center));
     mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: center == null ? LatLng(0, 0) : center, zoom: 15.0)));
+        zoom: 15.0, target: center)));
     getNearbyPlaces(center);
   }
  

@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 const kGoogleApiKey = "AIzaSyBSN2njU9C-NnWUUlDzSiljSy6AViPCEMk";
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
@@ -51,9 +52,17 @@ class PhotoBoxState extends State<PhotoBox> {
           case ConnectionState.none:
             return new Text('No photos');
           case ConnectionState.waiting:
-            return new CircularProgressIndicator();
-          case ConnectionState.active:            
-            return new CircularProgressIndicator();
+            return new Container(
+              height: 150.0,
+              width: MediaQuery.of(context).size.width,
+              child: SpinKitWave(color: Colors.blueAccent, type: SpinKitWaveType.center)
+            );
+          case ConnectionState.active:
+            return new Container(
+              height: 150.0,
+              width: MediaQuery.of(context).size.width,
+              child: SpinKitWave(color: Colors.blueAccent, type: SpinKitWaveType.center)
+            );
           case ConnectionState.done:
             return new Container(
               height: 150.0,
