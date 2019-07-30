@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:backdrop/pages/map_page.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter/material.dart';

@@ -28,7 +28,7 @@ class MapPageState extends State<MapPage> {
   String errorMessage;
   bool _pressed = false;
   String _placeId;
-  int radius = 2500;
+  int radius = 10000;
   Map markerMap = new HashMap<String, String>();
  
   @override
@@ -75,7 +75,7 @@ class MapPageState extends State<MapPage> {
             color: Colors.grey,
             icon: Icon(Icons.search),
             onPressed: () {
-              _handlePressButton();
+              _handlePressSearch();
             },
           ),
           IconButton(
@@ -183,7 +183,12 @@ class MapPageState extends State<MapPage> {
               ),
               child: InkWell(
                 onTap: () {
-                  showPhotoBox(f.placeId);
+                  showPhotoBox(f.placeId);   
+                  mapController.animateCamera(
+                    CameraUpdate.newCameraPosition(
+                      CameraPosition(
+                        zoom: 15.0, 
+                        target: new LatLng(f.geometry.location.lat, f.geometry.location.lng))));                                               
                 },
                 highlightColor: Colors.lightBlueAccent,
                 splashColor: Colors.blueAccent,
@@ -239,7 +244,7 @@ class MapPageState extends State<MapPage> {
         );
       }
     
-      Future <void> _handlePressButton() async {
+      Future <void> _handlePressSearch() async {
         try {
           final center = await getUserLocation();
           Prediction p = await PlacesAutocomplete.show(       
@@ -247,14 +252,13 @@ class MapPageState extends State<MapPage> {
               strictbounds: center == null ? false : true,
               apiKey: kGoogleApiKey,
               onError: onError,
-              mode: Mode.fullscreen,
+              mode: Mode.overlay,
               language: "en",
               location: center == null
                   ? null
                   : Location(center.latitude, center.longitude),
               radius: center == null ? null : 10000);
-              print("handlePressButton");
-              
+
           showPhotoBox(p.placeId);
         } catch (e) {
           return;
@@ -262,7 +266,6 @@ class MapPageState extends State<MapPage> {
       }
     
       void _onMarkerTapped(Marker marker) {
-        print(markerMap);
         return showPhotoBox(markerMap[marker.id]);
       }
   }
