@@ -28,7 +28,7 @@ class MapPageState extends State<MapPage> {
   String errorMessage;
   bool _pressed = false;
   String _placeId;
-  int radius = 10000;
+  int radius = 1000;
   Map markerMap = new HashMap<String, String>();
  
   @override
@@ -39,7 +39,7 @@ class MapPageState extends State<MapPage> {
       ]);
     Widget expandedChild;
     if (isLoading) {
-      expandedChild = Center(child: SpinKitWave(color: Colors.blueAccent, type: SpinKitWaveType.center));
+      expandedChild = Center(child: SpinKitWave(color: Colors.green[300], type: SpinKitWaveType.center));
     } else if (errorMessage != null) {
       expandedChild = Center(
         child: Text(errorMessage),
@@ -55,24 +55,11 @@ class MapPageState extends State<MapPage> {
         backgroundColor: Colors.white,
         title: const Text(
           "Nearby Backdrops",
-          style: TextStyle(color: Colors.grey)
+          style: TextStyle(color: Colors.green)
           ),
         actions: <Widget>[
-          isLoading
-              ? IconButton(
-                  color: Colors.grey,
-                  icon: Icon(Icons.timer),
-                  onPressed: () {},
-                )
-              : IconButton(
-                  color: Colors.grey,
-                  icon: Icon(Icons.refresh),
-                  onPressed: () {
-                    refresh();
-                  },
-                ),
           IconButton(
-            color: Colors.grey,
+            color: Colors.green[300],
             icon: Icon(Icons.search),
             onPressed: () {
               _handlePressSearch();
@@ -92,7 +79,7 @@ class MapPageState extends State<MapPage> {
         children: <Widget>[
           Container(            
             child: SizedBox(            
-                height: 330.0,
+                height: 290.0,
                 child: GoogleMap(                  
                     onMapCreated: _onMapCreated,
                     options: GoogleMapOptions(
@@ -190,8 +177,8 @@ class MapPageState extends State<MapPage> {
                         zoom: 15.0, 
                         target: new LatLng(f.geometry.location.lat, f.geometry.location.lng))));                                               
                 },
-                highlightColor: Colors.lightBlueAccent,
-                splashColor: Colors.blueAccent,
+                highlightColor: Colors.lightGreenAccent,
+                splashColor: Colors.green[300],
                 child: Padding(
                   padding: EdgeInsets.all(2.0),
                   child: Column(
@@ -257,7 +244,12 @@ class MapPageState extends State<MapPage> {
               location: center == null
                   ? null
                   : Location(center.latitude, center.longitude),
-              radius: center == null ? null : 10000);
+              radius: center == null ? null : 3940000);
+
+          PlacesDetailsResponse place = await _places.getDetailsByPlaceId(p.placeId);
+          LatLng placeLocation = LatLng(place.result.geometry.location.lat, place.result.geometry.location.lng);
+          mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+            zoom: 15.0, target: placeLocation)));
 
           showPhotoBox(p.placeId);
         } catch (e) {

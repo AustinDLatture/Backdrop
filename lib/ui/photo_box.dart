@@ -52,19 +52,19 @@ class PhotoBoxState extends State<PhotoBox> {
             return new Text('No photos');
           case ConnectionState.waiting:
             return new Container(
-              height: 150.0,
+              height: 190.0,
               width: MediaQuery.of(context).size.width,
-              child: SpinKitWave(color: Colors.blueAccent, type: SpinKitWaveType.center)
+              child: SpinKitWave(color: Colors.green[300], type: SpinKitWaveType.center)
             );
           case ConnectionState.active:
             return new Container(
-              height: 150.0,
+              height: 190.0,
               width: MediaQuery.of(context).size.width,
               child: SpinKitWave(color: Colors.blueAccent, type: SpinKitWaveType.center)
             );
           case ConnectionState.done:
             return new Container(
-              height: 150.0,
+              height: 190.0,
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: <Widget>[
@@ -101,7 +101,7 @@ class PhotoBoxState extends State<PhotoBox> {
     if (placeDetail.photos != null) {
       final photos = placeDetail.photos;
       list.add(SizedBox(
-          height: 145.0,
+          height: 185.0,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: photos.length,
@@ -111,9 +111,13 @@ class PhotoBoxState extends State<PhotoBox> {
                     child: SizedBox(
                       height: 100,
                       child: Image.network(
-                          buildPhotoURL(photos[index].photoReference)),
-                    ));
-              })));
+                          buildPhotoURL(photos[index].photoReference)
+                        ),
+                    )
+                  );
+              })
+            )
+          );
     }
     return ListView(
       shrinkWrap: true,
