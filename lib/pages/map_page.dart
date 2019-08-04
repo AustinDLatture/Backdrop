@@ -52,22 +52,22 @@ class MapPageState extends State<MapPage> {
       key: homeScaffoldKey,
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.green[300],
         title: const Text(
           "Nearby Backdrops",
-          style: TextStyle(color: Colors.green)
+          style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontStyle: FontStyle.italic)
           ),
         actions: <Widget>[
           IconButton(
-            color: Colors.green[300],
+            color: Colors.white,
             icon: Icon(Icons.search),
             onPressed: () {
               _handlePressSearch();
             },
           ),
           IconButton(
-            color: Colors.green[300],
-            icon: Icon(Icons.pageview),
+            color: Colors.white,
+            icon: Icon(Icons.photo_size_select_actual),
             iconSize: 40.0,
             onPressed: () {
               //Open advanced search
@@ -151,6 +151,7 @@ class MapPageState extends State<MapPage> {
               padding: EdgeInsets.only(bottom: 2.0),
               child: Text(
                 f.formattedAddress,
+                style: TextStyle(fontFamily: "Freight Sans")
               ),
             ));
           }
@@ -159,6 +160,7 @@ class MapPageState extends State<MapPage> {
               padding: EdgeInsets.only(bottom: 2.0),
               child: Text(
                 f.vicinity,
+                style: TextStyle(fontFamily: "Freight Sans")
               ),
             ));
           }
@@ -170,7 +172,7 @@ class MapPageState extends State<MapPage> {
               ),
               child: InkWell(
                 onTap: () {
-                  showPhotoBox(f.placeId);   
+                    showPhotoBox(f.placeId);  
                   mapController.animateCamera(
                     CameraUpdate.newCameraPosition(
                       CameraPosition(
@@ -250,8 +252,7 @@ class MapPageState extends State<MapPage> {
           LatLng placeLocation = LatLng(place.result.geometry.location.lat, place.result.geometry.location.lng);
           mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
             zoom: 15.0, target: placeLocation)));
-
-          showPhotoBox(p.placeId);
+              showPhotoBox(p.placeId);
         } catch (e) {
           return;
         }

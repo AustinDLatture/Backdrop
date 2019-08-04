@@ -117,7 +117,19 @@ class PhotoBoxState extends State<PhotoBox> {
                   );
               })
             )
-          );
+          ); 
+    } else {
+      list.add(SizedBox(
+          height: 185,
+          child: Align(
+            alignment: Alignment.center,
+            child: const Text("No photos available :(",
+            style: TextStyle(color: Colors.green[300], fontFamily: "Freight Sans", fontSize: 50, fontStyle: FontStyle.italic),
+            textAlign: TextAlign.center,
+            )
+          )
+        )
+      );
     }
     return ListView(
       shrinkWrap: true,
