@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
+import 'package:backdrop/global.dart' as global;
+import 'package:backdrop/pages/categories_page.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +10,9 @@ import 'package:location/location.dart' as LocationManager;
 import '../ui/photo_box.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/services.dart';
- 
-const kGoogleApiKey = "AIzaSyBSN2njU9C-NnWUUlDzSiljSy6AViPCEMk";
-GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
+
 String placeId;
+GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: global.kGoogleApiKey);
  
 class MapPage extends StatefulWidget {
   @override
@@ -39,7 +40,7 @@ class MapPageState extends State<MapPage> {
       ]);
     Widget expandedChild;
     if (isLoading) {
-      expandedChild = Center(child: SpinKitWave(color: Colors.green[300], type: SpinKitWaveType.center));
+      expandedChild = Center(child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center));
     } else if (errorMessage != null) {
       expandedChild = Center(
         child: Text(errorMessage),
@@ -52,7 +53,7 @@ class MapPageState extends State<MapPage> {
       key: homeScaffoldKey,
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        backgroundColor: Colors.green[300],
+        backgroundColor: global.seafoamGreen,
         title: const Text(
           "Nearby Backdrops",
           style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontStyle: FontStyle.italic)
@@ -70,7 +71,10 @@ class MapPageState extends State<MapPage> {
             icon: Icon(Icons.photo_size_select_actual),
             iconSize: 40.0,
             onPressed: () {
-              //Open advanced search
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CategoriesPage()),
+              );
             },
           ),
         ],
@@ -179,8 +183,8 @@ class MapPageState extends State<MapPage> {
                         zoom: 15.0, 
                         target: new LatLng(f.geometry.location.lat, f.geometry.location.lng))));                                               
                 },
-                highlightColor: Colors.lightGreenAccent,
-                splashColor: Colors.green[300],
+                highlightColor: global.seafoamGreen,
+                splashColor: global.seafoamGreen,
                 child: Padding(
                   padding: EdgeInsets.all(2.0),
                   child: Column(
@@ -239,7 +243,7 @@ class MapPageState extends State<MapPage> {
           Prediction p = await PlacesAutocomplete.show(       
               context: context,
               strictbounds: center == null ? false : true,
-              apiKey: kGoogleApiKey,
+              apiKey: global.kGoogleApiKey,
               onError: onError,
               mode: Mode.overlay,
               language: "en",

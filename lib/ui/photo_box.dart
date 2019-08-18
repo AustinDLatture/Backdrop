@@ -5,9 +5,9 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:backdrop/global.dart' as global;
 
-const kGoogleApiKey = "AIzaSyBSN2njU9C-NnWUUlDzSiljSy6AViPCEMk";
-GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
+GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: global.kGoogleApiKey);
 
 class PhotoBox extends StatefulWidget {
   String placeId;
@@ -54,7 +54,7 @@ class PhotoBoxState extends State<PhotoBox> {
             return new Container(
               height: 190.0,
               width: MediaQuery.of(context).size.width,
-              child: SpinKitWave(color: Colors.green[300], type: SpinKitWaveType.center)
+              child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
             );
           case ConnectionState.active:
             return new Container(
@@ -93,7 +93,7 @@ class PhotoBoxState extends State<PhotoBox> {
   }
 
   String buildPhotoURL(String photoReference) {
-    return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${kGoogleApiKey}";
+    return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${global.kGoogleApiKey}";
   }
 
   ListView buildPhotoList(PlaceDetails placeDetail) {
@@ -123,8 +123,8 @@ class PhotoBoxState extends State<PhotoBox> {
           height: 185,
           child: Align(
             alignment: Alignment.center,
-            child: const Text("No photos available :(",
-            style: TextStyle(color: Colors.green[300], fontFamily: "Freight Sans", fontSize: 50, fontStyle: FontStyle.italic),
+            child: Text("No photos available :(",
+            style: TextStyle(color: global.seafoamGreen, fontFamily: "Freight Sans", fontSize: 50, fontStyle: FontStyle.italic),
             textAlign: TextAlign.center,
             )
           )
