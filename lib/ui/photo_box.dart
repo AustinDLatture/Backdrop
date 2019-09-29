@@ -60,7 +60,7 @@ class PhotoBoxState extends State<PhotoBox> {
             return new Container(
               height: 190.0,
               width: MediaQuery.of(context).size.width,
-              child: SpinKitWave(color: Colors.blueAccent, type: SpinKitWaveType.center)
+              child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
             );
           case ConnectionState.done:
             return new Container(

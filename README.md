@@ -1,16 +1,4 @@
 # backdrop
 
-A new Flutter project.
+Developed in Flutter, this app serves as a learning tool to discover and traverse Google's Maps SDK and Places API and implement across multiple platforms and devices. Flutter compiles Dart code ahead of time depending on the device, leading to a small drop in performance compared to native Swift or Kotlin. Therefore, Flutter development provides interesting challenges in optimization and providing a cohesive and universally familiar user experience. 
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.

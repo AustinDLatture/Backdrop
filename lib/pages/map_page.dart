@@ -106,163 +106,162 @@ class MapPageState extends State<MapPage> {
         refresh();
       }
   
-      Future <LatLng> getUserLocation() async {
-        var currentLocation = <String, double>{};
-        final location = LocationManager.Location();
-        try {
-          currentLocation = await location.getLocation();
-          final lat = currentLocation["latitude"];
-          final lng = currentLocation["longitude"];
-          final center = LatLng(lat, lng);
-          return center;
-        } on Exception {
-          currentLocation = null;
-          return null;
-        }
-      }
-        void refresh() async {
-        final center = await getUserLocation();
-        //Hacky workaround to center the camera. 
-        //TODO: Check for the resolution to this bug in Google Maps iOS SDK
-        mapController.moveCamera(CameraUpdate.newLatLng(center));
-        mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-            zoom: 15.0, target: center)));
-        getNearbyPlaces(center);
-      }
+  Future <LatLng> getUserLocation() async {
+    var currentLocation = <String, double>{};
+    final location = LocationManager.Location();
+    try {
+      currentLocation = await location.getLocation();
+      final lat = currentLocation["latitude"];
+      final lng = currentLocation["longitude"];
+      final center = LatLng(lat, lng);
+      return center;
+    } on Exception {
+      currentLocation = null;
+      return null;
+    }
+  }
+
+  void refresh() async {
+    final center = await getUserLocation();
+    //Hacky workaround to center the camera. 
+    mapController.moveCamera(CameraUpdate.newLatLng(center));
+    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        zoom: 15.0, target: center)));
+    getNearbyPlaces(center);
+  }
      
-      void showPhotoBox(String placeId) {
-        if (placeId != _placeId) {
-          setState(() {
-            _placeId = placeId;
-            _pressed = true;
-          });
-        }
-      }
+  void showPhotoBox(String placeId) {
+    if (placeId != _placeId) {
+      setState(() {
+        _placeId = placeId;
+        _pressed = true;
+      });
+    }
+  }
      
-      ListView buildPlacesList() {
-        final placesWidget = places.map((f) {
-          List<Widget> list = [
-            Padding(
-              padding: EdgeInsets.only(bottom: 4.0),
-              child: Text(
-                f.name,
-                style: Theme.of(context).textTheme.subtitle,
-              ),
-            )
-          ];
-          if (f.formattedAddress != null) {
-            list.add(Padding(
-              padding: EdgeInsets.only(bottom: 2.0),
-              child: Text(
-                f.formattedAddress,
-                style: TextStyle(fontFamily: "Freight Sans")
-              ),
-            ));
-          }
-          if (f.vicinity != null) {
-            list.add(Padding(
-              padding: EdgeInsets.only(bottom: 2.0),
-              child: Text(
-                f.vicinity,
-                style: TextStyle(fontFamily: "Freight Sans")
-              ),
-            ));
-          }
-          return Padding(
-            padding: EdgeInsets.only(top: 1.0, bottom: 1.0, left: 8.0, right: 8.0),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10))
-              ),
-              child: InkWell(
-                onTap: () {
-                    showPhotoBox(f.placeId);  
-                  mapController.animateCamera(
-                    CameraUpdate.newCameraPosition(
-                      CameraPosition(
-                        zoom: 15.0, 
-                        target: new LatLng(f.geometry.location.lat, f.geometry.location.lng))));                                               
-                },
-                highlightColor: global.seafoamGreen,
-                splashColor: global.seafoamGreen,
-                child: Padding(
-                  padding: EdgeInsets.all(2.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: list,
-                  ),
-                ),
+  ListView buildPlacesList() {
+    final placesWidget = places.map((f) {
+      List<Widget> list = [
+        Padding(
+          padding: EdgeInsets.only(bottom: 4.0),
+          child: Text(
+            f.name,
+            style: Theme.of(context).textTheme.subtitle,
+          ),
+        )
+      ];
+      if (f.formattedAddress != null) {
+        list.add(Padding(
+          padding: EdgeInsets.only(bottom: 2.0),
+          child: Text(
+            f.formattedAddress,
+            style: TextStyle(fontFamily: "Freight Sans")
+          ),
+        ));
+      }
+      if (f.vicinity != null) {
+        list.add(Padding(
+          padding: EdgeInsets.only(bottom: 2.0),
+          child: Text(
+            f.vicinity,
+            style: TextStyle(fontFamily: "Freight Sans")
+          ),
+        ));
+      }
+      return Padding(
+        padding: EdgeInsets.only(top: 1.0, bottom: 1.0, left: 8.0, right: 8.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))
+          ),
+          child: InkWell(
+            onTap: () {
+                showPhotoBox(f.placeId);  
+              mapController.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(
+                    zoom: 15.0, 
+                    target: new LatLng(f.geometry.location.lat, f.geometry.location.lng))));                                               
+            },
+            highlightColor: global.seafoamGreen,
+            splashColor: global.seafoamGreen,
+            child: Padding(
+              padding: EdgeInsets.all(2.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: list,
               ),
             ),
-          );
-        }).toList();
-     
-        return ListView(shrinkWrap: true, children: placesWidget);
-      }
-      
-        void getNearbyPlaces(LatLng center) async {
-        setState(() {
-          this.isLoading = true;
-          this.errorMessage = null;
-        });
-     
-        final location = Location(center.latitude, center.longitude);
-        final result = await _places.searchNearbyWithRadius(location, radius);
-        setState(() {
-          this.isLoading = false;
-          if (result.status == "OK") {
-            this.places = result.results;
-            result.results.forEach((f) {          
-              final markerOptions = MarkerOptions(
-                  position:
-                    LatLng(f.geometry.location.lat, f.geometry.location.lng),
-                    infoWindowText: InfoWindowText("${f.name}", "${f.types?.first}"),             
-                  );
-    
-              mapController.addMarker(markerOptions).then((marker) => 
-                markerMap.putIfAbsent(marker.id, () => f.placeId)
-              );
-            }
-          );
-          } else {
-            this.errorMessage = result.errorMessage;
-          }
-        });
-      }
-     
-      void onError(PlacesAutocompleteResponse response) {
-        homeScaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text(response.errorMessage)),
-        );
-      }
-    
-      Future <void> _handlePressSearch() async {
-        try {
-          final center = await getUserLocation();
-          Prediction p = await PlacesAutocomplete.show(       
-              context: context,
-              strictbounds: center == null ? false : true,
-              apiKey: global.kGoogleApiKey,
-              onError: onError,
-              mode: Mode.overlay,
-              language: "en",
-              location: center == null
-                  ? null
-                  : Location(center.latitude, center.longitude),
-              radius: center == null ? null : 3940000);
-
-          PlacesDetailsResponse place = await _places.getDetailsByPlaceId(p.placeId);
-          LatLng placeLocation = LatLng(place.result.geometry.location.lat, place.result.geometry.location.lng);
-          mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-            zoom: 15.0, target: placeLocation)));
-              showPhotoBox(p.placeId);
-        } catch (e) {
-          return;
-        }
-      }
-    
-      void _onMarkerTapped(Marker marker) {
-        return showPhotoBox(markerMap[marker.id]);
-      }
+          ),
+        ),
+      );
+    }).toList();
+    return ListView(shrinkWrap: true, children: placesWidget);
   }
+      
+  void getNearbyPlaces(LatLng center) async {
+    setState(() {
+      this.isLoading = true;
+      this.errorMessage = null;
+    });
+     
+    final location = Location(center.latitude, center.longitude);
+    final result = await _places.searchNearbyWithRadius(location, radius);
+    setState(() {
+      this.isLoading = false;
+      if (result.status == "OK") {
+        this.places = result.results;
+        result.results.forEach((f) {          
+          final markerOptions = MarkerOptions(
+              position:
+                LatLng(f.geometry.location.lat, f.geometry.location.lng),
+                infoWindowText: InfoWindowText("${f.name}", "${f.types?.first}"),             
+              );
+
+          mapController.addMarker(markerOptions).then((marker) => 
+            markerMap.putIfAbsent(marker.id, () => f.placeId)
+          );
+        }
+      );
+      } else {
+        this.errorMessage = result.errorMessage;
+      }
+    });
+  }
+  
+  void onError(PlacesAutocompleteResponse response) {
+    homeScaffoldKey.currentState.showSnackBar(
+      SnackBar(content: Text(response.errorMessage)),
+    );
+  }
+    
+  Future <void> _handlePressSearch() async {
+    try {
+      final center = await getUserLocation();
+      Prediction p = await PlacesAutocomplete.show(       
+          context: context,
+          strictbounds: center == null ? false : true,
+          apiKey: global.kGoogleApiKey,
+          onError: onError,
+          mode: Mode.overlay,
+          language: "en",
+          location: center == null
+              ? null
+              : Location(center.latitude, center.longitude),
+          radius: center == null ? null : 3940000);
+
+      PlacesDetailsResponse place = await _places.getDetailsByPlaceId(p.placeId);
+      LatLng placeLocation = LatLng(place.result.geometry.location.lat, place.result.geometry.location.lng);
+      mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        zoom: 15.0, target: placeLocation)));
+          showPhotoBox(p.placeId);
+    } catch (e) {
+      return;
+    }
+  }
+    
+  void _onMarkerTapped(Marker marker) {
+    return showPhotoBox(markerMap[marker.id]);
+  }
+}
