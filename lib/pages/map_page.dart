@@ -15,6 +15,10 @@ String placeId;
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: global.kGoogleApiKey);
  
 class MapPage extends StatefulWidget {
+  final String filterCategory;
+  
+  MapPage({this.filterCategory});
+
   @override
   State<StatefulWidget> createState() {
     return MapPageState();
@@ -31,6 +35,10 @@ class MapPageState extends State<MapPage> {
   String _placeId;
   int radius = 1000;
   Map markerMap = new HashMap<String, String>();
+  String filterCategory;
+
+  //for testing
+  LatLng GR = new LatLng(42.9634, -85.6681); 
  
   @override
   Widget build(BuildContext context) {
@@ -39,6 +47,10 @@ class MapPageState extends State<MapPage> {
         DeviceOrientation.portraitDown,
       ]);
     Widget expandedChild;
+    if (widget.filterCategory != null) {
+      this.filterCategory = widget.filterCategory;
+    }
+
     if (isLoading) {
       expandedChild = Center(child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center));
     } else if (errorMessage != null) {
@@ -94,7 +106,8 @@ class MapPageState extends State<MapPage> {
           _pressed 
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
           : new SizedBox(),
-          Expanded(child: expandedChild)
+          Expanded(child: expandedChild),
+          Container(padding: EdgeInsets.all(10.0), color: global.seafoamGreen)
         ],
       )
     );
@@ -103,8 +116,8 @@ class MapPageState extends State<MapPage> {
   void _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
     mapController.onMarkerTapped.add(_onMarkerTapped);
-        refresh();
-      }
+    refresh();
+  }
   
   Future <LatLng> getUserLocation() async {
     var currentLocation = <String, double>{};
@@ -138,8 +151,39 @@ class MapPageState extends State<MapPage> {
       });
     }
   }
+
+  List<PlacesSearchResult> filterByCategory(List<PlacesSearchResult> places, String category) {
+    var placeMap = {
+    'travel': ['airport',  'bus_station', 
+            'campground', 'subway_station”', 
+            'train_station', 'taxi_stand',  
+            'transit_station'],
+    'fun': ['amusement_park', 'bowling alley', 
+          'casino', 'aquarium', 'movie_theater', 
+          'night_club', 'spa',  'stadium', 'zoo'],
+    'art': ['art_gallery', 'museum',  'painter'],
+    'food': ['bakery', 'bar', 'cafe', 'restaurant',  'supermarket'],
+    'shopping': ['bicycle_store', 'book_store', 'jewelry_store', 
+          'pet_store',	'clothing_store', 'convenience_store', 
+          'department_store', 'shoe_store', 'electronics_store',
+          'store', 'furniture_store','hardware_store', 'home_goods_store',
+          'shopping_mall'],
+    'architecture': ['city_hall',  'courthouse',  'embassy', 'lodging', 'political'],
+    'nature': ['park',  'florist']
+    };
+    List<PlacesSearchResult> filteredPlaces = [];
+    List<String> placesCategories = placeMap[category];
+    for (PlacesSearchResult place in places) {
+      for (String category in placesCategories) {
+        if (place.types.contains(category)) {
+          filteredPlaces.add(place);
+        }
+      }
+    }
+    return filteredPlaces;
+  }
      
-  ListView buildPlacesList() {
+  Container buildPlacesList() {
     final placesWidget = places.map((f) {
       List<Widget> list = [
         Padding(
@@ -197,7 +241,10 @@ class MapPageState extends State<MapPage> {
         ),
       );
     }).toList();
-    return ListView(shrinkWrap: true, children: placesWidget);
+    return Container(
+      color: global.seafoamGreen,
+      child: ListView(shrinkWrap: true, children: placesWidget)
+    );
   }
       
   void getNearbyPlaces(LatLng center) async {
@@ -212,7 +259,10 @@ class MapPageState extends State<MapPage> {
       this.isLoading = false;
       if (result.status == "OK") {
         this.places = result.results;
-        result.results.forEach((f) {          
+        if(filterCategory != null) {
+          this.places = filterByCategory(this.places, filterCategory);
+        }
+        this.places.forEach((f) {          
           final markerOptions = MarkerOptions(
               position:
                 LatLng(f.geometry.location.lat, f.geometry.location.lng),

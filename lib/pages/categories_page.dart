@@ -31,14 +31,38 @@ class CategoriesPageState extends State<CategoriesPage> {
           style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontStyle: FontStyle.italic)
         )
       ),
-      body: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              new Builder(builder: (BuildContext context) { return new CategoryCard("nature"); }),
-              new Builder(builder: (BuildContext context) { return new CategoryCard("Not yeety"); }) 
-            ],
-          )
+      body: Column (
+        children: <Widget> [
+          Expanded(child: 
+            ListView(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("nature"); }),
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("travel"); })
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("fun"); }),
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("art"); })
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("food"); }),
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("shopping"); })
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("architecture"); })
+                  ],
+                ),
+              ]
+            )
+          ),
+          Container(padding: EdgeInsets.all(10.0), color: global.seafoamGreen)
         ]
       )
     );

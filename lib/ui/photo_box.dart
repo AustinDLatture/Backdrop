@@ -64,16 +64,17 @@ class PhotoBoxState extends State<PhotoBox> {
             );
           case ConnectionState.done:
             return new Container(
+              color: global.seafoamGreen,
               height: 190.0,
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: <Widget>[
                   Expanded(
                     child: buildPhotoList(this.placeDetails),
-                    )
-                  ],
-                )
-              ); 
+                  )
+                ],
+              )
+            ); 
         }
       }
     );
@@ -101,7 +102,7 @@ class PhotoBoxState extends State<PhotoBox> {
     if (placeDetail.photos != null) {
       final photos = placeDetail.photos;
       list.add(SizedBox(
-          height: 185.0,
+          height: 190.0,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: photos.length,
@@ -109,7 +110,7 @@ class PhotoBoxState extends State<PhotoBox> {
                 return Padding(
                     padding: EdgeInsets.only(right: 1.0),
                     child: SizedBox(
-                      height: 100,
+                      height: 190,
                       child: Image.network(
                           buildPhotoURL(photos[index].photoReference)
                         ),
