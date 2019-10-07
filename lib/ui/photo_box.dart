@@ -52,20 +52,20 @@ class PhotoBoxState extends State<PhotoBox> {
             return new Text('No photos');
           case ConnectionState.waiting:
             return new Container(
-              height: 190.0,
+              height: 263.0,
               width: MediaQuery.of(context).size.width,
               child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
             );
           case ConnectionState.active:
             return new Container(
-              height: 190.0,
+              height: 263.0,
               width: MediaQuery.of(context).size.width,
               child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
             );
           case ConnectionState.done:
             return new Container(
               color: global.seafoamGreen,
-              height: 190.0,
+              height: 263.0,
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: <Widget>[
@@ -78,7 +78,6 @@ class PhotoBoxState extends State<PhotoBox> {
         }
       }
     );
-       
   }
 
   Future<PlacesDetailsResponse> fetchPlaceDetail() async {
@@ -94,7 +93,7 @@ class PhotoBoxState extends State<PhotoBox> {
   }
 
   String buildPhotoURL(String photoReference) {
-    return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${global.kGoogleApiKey}";
+    return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$photoReference&key=${global.kGoogleApiKey}";
   }
 
   ListView buildPhotoList(PlaceDetails placeDetail) {
@@ -102,7 +101,7 @@ class PhotoBoxState extends State<PhotoBox> {
     if (placeDetail.photos != null) {
       final photos = placeDetail.photos;
       list.add(SizedBox(
-          height: 190.0,
+          height: 263.0,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: photos.length,
@@ -110,7 +109,7 @@ class PhotoBoxState extends State<PhotoBox> {
                 return Padding(
                     padding: EdgeInsets.only(right: 1.0),
                     child: SizedBox(
-                      height: 190,
+                      height: 263,
                       child: Image.network(
                           buildPhotoURL(photos[index].photoReference)
                         ),
@@ -121,12 +120,14 @@ class PhotoBoxState extends State<PhotoBox> {
           ); 
     } else {
       list.add(SizedBox(
-          height: 185,
-          child: Align(
-            alignment: Alignment.center,
-            child: Text("No photos available :(",
-            style: TextStyle(color: global.seafoamGreen, fontFamily: "Freight Sans", fontSize: 50, fontStyle: FontStyle.italic),
-            textAlign: TextAlign.center,
+          height: 263,
+          child: Container(color: global.seafoamGreen, child: 
+            Align(
+              alignment: Alignment.center,
+              child: Text("No photos available :(",
+              style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontSize: 50, fontStyle: FontStyle.italic),
+              textAlign: TextAlign.center,
+              )
             )
           )
         )

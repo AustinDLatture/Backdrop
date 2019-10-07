@@ -32,6 +32,7 @@ class CategoriesPageState extends State<CategoriesPage> {
         )
       ),
       body: Column (
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget> [
           Expanded(child: 
             ListView(
@@ -41,24 +42,25 @@ class CategoriesPageState extends State<CategoriesPage> {
                     new Builder(builder: (BuildContext context) { return new CategoryCard("nature"); }),
                     new Builder(builder: (BuildContext context) { return new CategoryCard("travel"); })
                   ],
-                ),
+                mainAxisAlignment: MainAxisAlignment.center),
                 Row(
                   children: <Widget>[
                     new Builder(builder: (BuildContext context) { return new CategoryCard("fun"); }),
                     new Builder(builder: (BuildContext context) { return new CategoryCard("art"); })
                   ],
-                ),
+                mainAxisAlignment: MainAxisAlignment.center),
                 Row(
                   children: <Widget>[
                     new Builder(builder: (BuildContext context) { return new CategoryCard("food"); }),
                     new Builder(builder: (BuildContext context) { return new CategoryCard("shopping"); })
                   ],
-                ),
+                mainAxisAlignment: MainAxisAlignment.center),
                 Row(
                   children: <Widget>[
-                    new Builder(builder: (BuildContext context) { return new CategoryCard("architecture"); })
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("architecture"); }),
+                    new Builder(builder: (BuildContext context) { return new CategoryCard("placeholder"); }),
                   ],
-                ),
+                mainAxisAlignment: MainAxisAlignment.center),
               ]
             )
           ),

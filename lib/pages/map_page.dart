@@ -38,7 +38,7 @@ class MapPageState extends State<MapPage> {
   String filterCategory;
 
   //for testing
-  LatLng GR = new LatLng(42.9634, -85.6681); 
+  LatLng gR = new LatLng(42.9634, -85.6681); 
  
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,17 @@ class MapPageState extends State<MapPage> {
         child: Text(errorMessage),
       );
     } else {
-      expandedChild = buildPlacesList();
+      expandedChild = _pressed 
+      ? new Text("")
+      : new Container(color: global.seafoamGreen, child: 
+        Center(child: 
+          Text(
+            "Welcome to Backdrop",
+            style: TextStyle(fontFamily: "Freight Sans", fontStyle: FontStyle.italic, fontSize: 66, color: Colors.white),
+            textAlign: TextAlign.center
+          )
+        )
+      );
     }
  
     return Scaffold(
@@ -95,7 +105,7 @@ class MapPageState extends State<MapPage> {
         children: <Widget>[
           Container(            
             child: SizedBox(            
-                height: 290.0,
+                height: (MediaQuery.of(context).size.height)/1.75, //Takes up 2/3 of display
                 child: GoogleMap(                  
                     onMapCreated: _onMapCreated,
                     options: GoogleMapOptions(
@@ -159,17 +169,17 @@ class MapPageState extends State<MapPage> {
             'train_station', 'taxi_stand',  
             'transit_station'],
     'fun': ['amusement_park', 'bowling alley', 
-          'casino', 'aquarium', 'movie_theater', 
-          'night_club', 'spa',  'stadium', 'zoo'],
+          'casino', 'movie_theater', 
+          'night_club', 'spa', 'stadium'],
     'art': ['art_gallery', 'museum',  'painter'],
-    'food': ['bakery', 'bar', 'cafe', 'restaurant',  'supermarket'],
+    'food': ['bakery', 'bar', 'cafe', 'restaurant', 'supermarket'],
     'shopping': ['bicycle_store', 'book_store', 'jewelry_store', 
           'pet_store',	'clothing_store', 'convenience_store', 
           'department_store', 'shoe_store', 'electronics_store',
           'store', 'furniture_store','hardware_store', 'home_goods_store',
           'shopping_mall'],
-    'architecture': ['city_hall',  'courthouse',  'embassy', 'lodging', 'political'],
-    'nature': ['park',  'florist']
+    'architecture': ['city_hall', 'courthouse',  'embassy', 'lodging', 'political'],
+    'nature': ['park',  'florist', 'aquarium', 'zoo']
     };
     List<PlacesSearchResult> filteredPlaces = [];
     List<String> placesCategories = placeMap[category];
@@ -181,70 +191,6 @@ class MapPageState extends State<MapPage> {
       }
     }
     return filteredPlaces;
-  }
-     
-  Container buildPlacesList() {
-    final placesWidget = places.map((f) {
-      List<Widget> list = [
-        Padding(
-          padding: EdgeInsets.only(bottom: 4.0),
-          child: Text(
-            f.name,
-            style: Theme.of(context).textTheme.subtitle,
-          ),
-        )
-      ];
-      if (f.formattedAddress != null) {
-        list.add(Padding(
-          padding: EdgeInsets.only(bottom: 2.0),
-          child: Text(
-            f.formattedAddress,
-            style: TextStyle(fontFamily: "Freight Sans")
-          ),
-        ));
-      }
-      if (f.vicinity != null) {
-        list.add(Padding(
-          padding: EdgeInsets.only(bottom: 2.0),
-          child: Text(
-            f.vicinity,
-            style: TextStyle(fontFamily: "Freight Sans")
-          ),
-        ));
-      }
-      return Padding(
-        padding: EdgeInsets.only(top: 1.0, bottom: 1.0, left: 8.0, right: 8.0),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))
-          ),
-          child: InkWell(
-            onTap: () {
-                showPhotoBox(f.placeId);  
-              mapController.animateCamera(
-                CameraUpdate.newCameraPosition(
-                  CameraPosition(
-                    zoom: 15.0, 
-                    target: new LatLng(f.geometry.location.lat, f.geometry.location.lng))));                                               
-            },
-            highlightColor: global.seafoamGreen,
-            splashColor: global.seafoamGreen,
-            child: Padding(
-              padding: EdgeInsets.all(2.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: list,
-              ),
-            ),
-          ),
-        ),
-      );
-    }).toList();
-    return Container(
-      color: global.seafoamGreen,
-      child: ListView(shrinkWrap: true, children: placesWidget)
-    );
   }
       
   void getNearbyPlaces(LatLng center) async {
@@ -314,4 +260,70 @@ class MapPageState extends State<MapPage> {
   void _onMarkerTapped(Marker marker) {
     return showPhotoBox(markerMap[marker.id]);
   }
+
+  /*   UNCOMMENT IF MAKING LIST WIDGET
+  Container buildPlacesList() {
+    final placesWidget = places.map((f) {
+      List<Widget> list = [
+        Padding(
+          padding: EdgeInsets.only(bottom: 4.0),
+          child: Text(
+            f.name,
+            style: Theme.of(context).textTheme.subtitle,
+          ),
+        )
+      ];
+      if (f.formattedAddress != null) {
+        list.add(Padding(
+          padding: EdgeInsets.only(bottom: 2.0),
+          child: Text(
+            f.formattedAddress,
+            style: TextStyle(fontFamily: "Freight Sans")
+          ),
+        ));
+      }
+      if (f.vicinity != null) {
+        list.add(Padding(
+          padding: EdgeInsets.only(bottom: 2.0),
+          child: Text(
+            f.vicinity,
+            style: TextStyle(fontFamily: "Freight Sans")
+          ),
+        ));
+      }
+      return Padding(
+        padding: EdgeInsets.only(top: 1.0, bottom: 1.0, left: 8.0, right: 8.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))
+          ),
+          child: InkWell(
+            onTap: () {
+                showPhotoBox(f.placeId);  
+              mapController.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(
+                    zoom: 15.0, 
+                    target: new LatLng(f.geometry.location.lat, f.geometry.location.lng))));                                               
+            },
+            highlightColor: global.seafoamGreen,
+            splashColor: global.seafoamGreen,
+            child: Padding(
+              padding: EdgeInsets.all(2.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: list,
+              ),
+            ),
+          ),
+        ),
+      );
+    }).toList();
+    return Container(
+      color: global.seafoamGreen,
+      child: ListView(shrinkWrap: true, children: placesWidget)
+    );
+  }
+  */
 }
