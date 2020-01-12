@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'package:backdrop/global.dart' as global;
 import 'package:backdrop/pages/categories_page.dart';
+import 'package:backdrop/pages/photo_upload_page.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,13 @@ class MapPageState extends State<MapPage> {
       );
     } else {
       expandedChild = _pressed 
-      ? new Text("")
+      ? new Container(color: global.seafoamGreen, child: 
+        Center(child: 
+          Text(
+            ""
+          )
+        )
+      )
       : new Container(color: global.seafoamGreen, child: 
         Center(child: 
           Text(
@@ -90,6 +97,16 @@ class MapPageState extends State<MapPage> {
           ),
           IconButton(
             color: Colors.white,
+            icon: Icon(Icons.add_a_photo),
+            onPressed: () {
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PhotoUploadPage()),
+              );
+            },
+          ),
+          IconButton(
+            color: Colors.white,
             icon: Icon(Icons.photo_size_select_actual),
             iconSize: 40.0,
             onPressed: () {
@@ -105,13 +122,17 @@ class MapPageState extends State<MapPage> {
         children: <Widget>[
           Container(            
             child: SizedBox(            
-                height: (MediaQuery.of(context).size.height)/1.75, //Takes up 2/3 of display
+                height: (MediaQuery.of(context).size.height)/1.75, //Takes up .5714 of display
                 child: GoogleMap(                  
                     onMapCreated: _onMapCreated,
                     options: GoogleMapOptions(
                         myLocationEnabled: true,
                         cameraPosition:
-                            const CameraPosition(target: LatLng(0.0, 0.0))))),
+                            const CameraPosition(target: LatLng(0.0, 0.0)
+                          )
+                        )
+                      )
+                    ),
           ),
           _pressed 
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
@@ -146,7 +167,7 @@ class MapPageState extends State<MapPage> {
 
   void refresh() async {
     final center = await getUserLocation();
-    //Hacky workaround to center the camera. 
+    //Hacky workaround to center the camera.
     mapController.moveCamera(CameraUpdate.newLatLng(center));
     mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         zoom: 15.0, target: center)));
@@ -163,6 +184,7 @@ class MapPageState extends State<MapPage> {
   }
 
   List<PlacesSearchResult> filterByCategory(List<PlacesSearchResult> places, String category) {
+    //Can this be optimized?
     var placeMap = {
     'travel': ['airport',  'bus_station', 
             'campground', 'subway_station”', 
@@ -251,7 +273,7 @@ class MapPageState extends State<MapPage> {
       LatLng placeLocation = LatLng(place.result.geometry.location.lat, place.result.geometry.location.lng);
       mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         zoom: 15.0, target: placeLocation)));
-          showPhotoBox(p.placeId);
+      showPhotoBox(p.placeId);
     } catch (e) {
       return;
     }

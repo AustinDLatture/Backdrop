@@ -29,7 +29,6 @@ class CategoryCardState extends State<CategoryCard> {
     child: addDisplayPropertiesToCard(widget.category));
   }
 
-
   Builder addDisplayPropertiesToCard(String categories) {
     switch(categories) {
       case "nature":
@@ -324,15 +323,7 @@ class CategoryCardState extends State<CategoryCard> {
       
       default:
         return new Builder(builder: (BuildContext context) { return new Text(""); });
-    } 
-      
-      
-      
-      
-      
-      
-      
-
+      } 
     }
   }
 

@@ -52,20 +52,20 @@ class PhotoBoxState extends State<PhotoBox> {
             return new Text('No photos');
           case ConnectionState.waiting:
             return new Container(
-              height: 263.0,
+              height: (MediaQuery.of(context).size.height)/3.6,
               width: MediaQuery.of(context).size.width,
               child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
             );
           case ConnectionState.active:
             return new Container(
-              height: 263.0,
+              height:(MediaQuery.of(context).size.height)/3.6,
               width: MediaQuery.of(context).size.width,
               child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
             );
           case ConnectionState.done:
             return new Container(
               color: global.seafoamGreen,
-              height: 263.0,
+              height: (MediaQuery.of(context).size.height)/3.6,
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: <Widget>[
@@ -101,7 +101,7 @@ class PhotoBoxState extends State<PhotoBox> {
     if (placeDetail.photos != null) {
       final photos = placeDetail.photos;
       list.add(SizedBox(
-          height: 263.0,
+          height: (MediaQuery.of(context).size.height)/3.6,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: photos.length,
@@ -109,7 +109,7 @@ class PhotoBoxState extends State<PhotoBox> {
                 return Padding(
                     padding: EdgeInsets.only(right: 1.0),
                     child: SizedBox(
-                      height: 263,
+                      height: (MediaQuery.of(context).size.height)/3.6,
                       child: Image.network(
                           buildPhotoURL(photos[index].photoReference)
                         ),
@@ -120,7 +120,7 @@ class PhotoBoxState extends State<PhotoBox> {
           ); 
     } else {
       list.add(SizedBox(
-          height: 263,
+          height: (MediaQuery.of(context).size.height)/3.6,
           child: Container(color: global.seafoamGreen, child: 
             Align(
               alignment: Alignment.center,

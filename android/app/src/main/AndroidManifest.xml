@@ -37,5 +37,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBSN2njU9C-NnWUUlDzSiljSy6AViPCEMk" />
+            
+        <!-- Image Cropper Boilerplate -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 </manifest>

@@ -20,10 +20,24 @@ dependencies:
   flutter:
     sdk: flutter
 
+  #Google Maps
   google_maps_flutter: ^0.0.3
   flutter_google_places: ^0.1.4
   location: ^1.4.1
+
+  #Spinkit
   flutter_spinkit: ^3.1.0
+  
+  #image_picker
+  image_picker: ^0.6.3
+
+  #image_cropper
+  image_cropper: ^1.0.2
+
+  #FireBase, prob don't need all of these
+  firebase_core: ^0.4.0+9
+  firebase_storage: ^3.0.4
+  cloud_firestore: ^0.12.9+5
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
