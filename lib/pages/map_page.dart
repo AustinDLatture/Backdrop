@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'package:backdrop/global.dart' as global;
 import 'package:backdrop/pages/categories_page.dart';
 import 'package:backdrop/pages/photo_upload_page.dart';
@@ -35,8 +34,9 @@ class MapPageState extends State<MapPage> {
   bool _pressed = false;
   String _placeId;
   int radius = 1000;
-  Map markerMap = new HashMap<String, String>();
+  Set<Marker> markers = {};
   String filterCategory;
+  LatLng center = LatLng(0,0);
 
   //for testing
   LatLng gR = new LatLng(42.9634, -85.6681); 
@@ -123,17 +123,13 @@ class MapPageState extends State<MapPage> {
           Container(            
             child: SizedBox(            
                 height: (MediaQuery.of(context).size.height)/1.75, //Takes up .5714 of display
-                child: GoogleMap(                  
-                    onMapCreated: _onMapCreated,
-                    options: GoogleMapOptions(
-                        myLocationEnabled: true,
-                        cameraPosition:
-                            const CameraPosition(target: LatLng(0.0, 0.0)
-                          )
-                        )
-                      )
-                    ),
-          ),
+                child: GoogleMap(               
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(target: center),
+                  markers: markers               
+                    )
+                  ),
+                ),
           _pressed 
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
           : new SizedBox(),
@@ -146,7 +142,6 @@ class MapPageState extends State<MapPage> {
  
   void _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
-    mapController.onMarkerTapped.add(_onMarkerTapped);
     refresh();
   }
   
@@ -166,10 +161,8 @@ class MapPageState extends State<MapPage> {
   }
 
   void refresh() async {
-    final center = await getUserLocation();
-    //Hacky workaround to center the camera.
-    mapController.moveCamera(CameraUpdate.newLatLng(center));
-    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+    center = await getUserLocation();
+    mapController.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
         zoom: 15.0, target: center)));
     getNearbyPlaces(center);
   }
@@ -221,31 +214,30 @@ class MapPageState extends State<MapPage> {
       this.errorMessage = null;
     });
      
-    final location = Location(center.latitude, center.longitude);
-    final result = await _places.searchNearbyWithRadius(location, radius);
-    setState(() {
-      this.isLoading = false;
-      if (result.status == "OK") {
-        this.places = result.results;
-        if(filterCategory != null) {
-          this.places = filterByCategory(this.places, filterCategory);
+      final location = Location(center.latitude, center.longitude);
+      final result = await _places.searchNearbyWithRadius(location, radius);
+      setState(() {
+        this.isLoading = false;
+        if (result.status == "OK") {
+          this.places = result.results;
+          if(filterCategory != null) {
+            this.places = filterByCategory(this.places, filterCategory);
+          }
+          this.places.forEach((f) {
+            markers.add(
+              Marker(
+                markerId: MarkerId(f.placeId), 
+                position: LatLng(f.geometry.location.lat, f.geometry.location.lng),
+                infoWindow: InfoWindow (title: f.name, snippet: "${f.types?.first}"),
+                onTap: () => showPhotoBox(f.placeId)
+              )
+            );         
+          }
+        );
+        } else {
+          this.errorMessage = result.errorMessage;
         }
-        this.places.forEach((f) {          
-          final markerOptions = MarkerOptions(
-              position:
-                LatLng(f.geometry.location.lat, f.geometry.location.lng),
-                infoWindowText: InfoWindowText("${f.name}", "${f.types?.first}"),             
-              );
-
-          mapController.addMarker(markerOptions).then((marker) => 
-            markerMap.putIfAbsent(marker.id, () => f.placeId)
-          );
-        }
-      );
-      } else {
-        this.errorMessage = result.errorMessage;
-      }
-    });
+      });
   }
   
   void onError(PlacesAutocompleteResponse response) {
@@ -256,7 +248,6 @@ class MapPageState extends State<MapPage> {
     
   Future <void> _handlePressSearch() async {
     try {
-      final center = await getUserLocation();
       Prediction p = await PlacesAutocomplete.show(       
           context: context,
           strictbounds: center == null ? false : true,
@@ -274,78 +265,9 @@ class MapPageState extends State<MapPage> {
       mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         zoom: 15.0, target: placeLocation)));
       showPhotoBox(p.placeId);
+      getNearbyPlaces(placeLocation);
     } catch (e) {
       return;
     }
   }
-    
-  void _onMarkerTapped(Marker marker) {
-    return showPhotoBox(markerMap[marker.id]);
-  }
-
-  /*   UNCOMMENT IF MAKING LIST WIDGET
-  Container buildPlacesList() {
-    final placesWidget = places.map((f) {
-      List<Widget> list = [
-        Padding(
-          padding: EdgeInsets.only(bottom: 4.0),
-          child: Text(
-            f.name,
-            style: Theme.of(context).textTheme.subtitle,
-          ),
-        )
-      ];
-      if (f.formattedAddress != null) {
-        list.add(Padding(
-          padding: EdgeInsets.only(bottom: 2.0),
-          child: Text(
-            f.formattedAddress,
-            style: TextStyle(fontFamily: "Freight Sans")
-          ),
-        ));
-      }
-      if (f.vicinity != null) {
-        list.add(Padding(
-          padding: EdgeInsets.only(bottom: 2.0),
-          child: Text(
-            f.vicinity,
-            style: TextStyle(fontFamily: "Freight Sans")
-          ),
-        ));
-      }
-      return Padding(
-        padding: EdgeInsets.only(top: 1.0, bottom: 1.0, left: 8.0, right: 8.0),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))
-          ),
-          child: InkWell(
-            onTap: () {
-                showPhotoBox(f.placeId);  
-              mapController.animateCamera(
-                CameraUpdate.newCameraPosition(
-                  CameraPosition(
-                    zoom: 15.0, 
-                    target: new LatLng(f.geometry.location.lat, f.geometry.location.lng))));                                               
-            },
-            highlightColor: global.seafoamGreen,
-            splashColor: global.seafoamGreen,
-            child: Padding(
-              padding: EdgeInsets.all(2.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: list,
-              ),
-            ),
-          ),
-        ),
-      );
-    }).toList();
-    return Container(
-      color: global.seafoamGreen,
-      child: ListView(shrinkWrap: true, children: placesWidget)
-    );
-  }
-  */
 }

@@ -1,13 +1,8 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:io';
 import 'package:backdrop/global.dart' as global;
-import 'package:google_maps_webservice/places.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:backdrop/ui/uploader.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart' as LocationManager;
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -114,7 +109,7 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
                             ),
                           ],
                         ),
-                    Row()
+                    Uploader(file: _imageFile)
                   ],
                 )
               )
