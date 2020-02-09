@@ -23,7 +23,7 @@ class PhotoBox extends StatefulWidget {
 }
 
 class PhotoBoxState extends State<PhotoBox> {
-  GoogleMapController mapController;
+  //GoogleMapController mapController;
   PlacesDetailsResponse place;
   PlaceDetails placeDetails;
   Future<PlacesDetailsResponse> _place;

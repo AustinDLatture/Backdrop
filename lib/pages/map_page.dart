@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:backdrop/global.dart' as global;
 import 'package:backdrop/pages/categories_page.dart';
 import 'package:backdrop/pages/photo_upload_page.dart';
@@ -8,8 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as LocationManager;
 import '../ui/photo_box.dart';
+import '../ui/user_photo_box.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:geohash/geohash.dart';
 
 String placeId;
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: global.kGoogleApiKey);
@@ -32,11 +38,17 @@ class MapPageState extends State<MapPage> {
   bool isLoading = false;
   String errorMessage;
   bool _pressed = false;
+  bool _userBox = false;
   String _placeId;
+  String _userBackdropId;
   int radius = 1000;
   Set<Marker> markers = {};
   String filterCategory;
-  LatLng center = LatLng(0,0);
+  LatLng _center = LatLng(0,0);
+  Set<DocumentSnapshot> userBackdrops = new Set();
+
+  Geoflutterfire geo = Geoflutterfire();
+  var uuid = Uuid();
 
   //for testing
   LatLng gR = new LatLng(42.9634, -85.6681); 
@@ -101,7 +113,10 @@ class MapPageState extends State<MapPage> {
             onPressed: () {
               Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PhotoUploadPage()),
+              MaterialPageRoute(builder: (context) => PhotoUploadPage(
+                          location: this._center,
+                      )
+                )
               );
             },
           ),
@@ -125,14 +140,17 @@ class MapPageState extends State<MapPage> {
                 height: (MediaQuery.of(context).size.height)/1.75, //Takes up .5714 of display
                 child: GoogleMap(               
                   onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(target: center),
+                  initialCameraPosition: CameraPosition(target: _center),
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
                   markers: markers               
                     )
                   ),
                 ),
           _pressed 
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
-          : new SizedBox(),
+          : _userBox ? new Builder(builder: (BuildContext context) { return new UserPhotoBox(_userBackdropId); })
+            : new SizedBox(),
           Expanded(child: expandedChild),
           Container(padding: EdgeInsets.all(10.0), color: global.seafoamGreen)
         ],
@@ -146,13 +164,11 @@ class MapPageState extends State<MapPage> {
   }
   
   Future <LatLng> getUserLocation() async {
-    var currentLocation = <String, double>{};
     final location = LocationManager.Location();
+    var currentLocation;
     try {
       currentLocation = await location.getLocation();
-      final lat = currentLocation["latitude"];
-      final lng = currentLocation["longitude"];
-      final center = LatLng(lat, lng);
+      final center = LatLng(currentLocation.latitude, currentLocation.longitude);
       return center;
     } on Exception {
       currentLocation = null;
@@ -161,10 +177,12 @@ class MapPageState extends State<MapPage> {
   }
 
   void refresh() async {
-    center = await getUserLocation();
+    _center = await getUserLocation();
+    //Workaround to fix iOS Google Maps SDK centering issue
     mapController.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        zoom: 15.0, target: center)));
-    getNearbyPlaces(center);
+        zoom: 15.0, target: _center)));
+    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _center)));
+    getNearbyPlaces(_center);
   }
      
   void showPhotoBox(String placeId) {
@@ -172,6 +190,7 @@ class MapPageState extends State<MapPage> {
       setState(() {
         _placeId = placeId;
         _pressed = true;
+        _userBox = false;
       });
     }
   }
@@ -213,33 +232,82 @@ class MapPageState extends State<MapPage> {
       this.isLoading = true;
       this.errorMessage = null;
     });
+
+    getUserBackdrops(center);
      
-      final location = Location(center.latitude, center.longitude);
-      final result = await _places.searchNearbyWithRadius(location, radius);
-      setState(() {
-        this.isLoading = false;
-        if (result.status == "OK") {
-          this.places = result.results;
-          if(filterCategory != null) {
-            this.places = filterByCategory(this.places, filterCategory);
-          }
-          this.places.forEach((f) {
-            markers.add(
-              Marker(
-                markerId: MarkerId(f.placeId), 
-                position: LatLng(f.geometry.location.lat, f.geometry.location.lng),
-                infoWindow: InfoWindow (title: f.name, snippet: "${f.types?.first}"),
-                onTap: () => showPhotoBox(f.placeId)
-              )
-            );         
-          }
-        );
-        } else {
-          this.errorMessage = result.errorMessage;
+    final location = Location(center.latitude, center.longitude);
+    final result = await _places.searchNearbyWithRadius(location, radius);
+    
+    setState(() {
+      this.isLoading = false;
+      if (result.status == "OK") {
+        this.places = result.results;
+        if(filterCategory != null) {
+          this.places = filterByCategory(this.places, filterCategory);
         }
-      });
+        this.places.forEach((f) {
+          markers.add(
+            Marker(
+              markerId: MarkerId(f.placeId),
+              position: LatLng(f.geometry.location.lat, f.geometry.location.lng),
+              infoWindow: InfoWindow (title: f.name, snippet: "${f.types?.first}"),
+              onTap: () => showPhotoBox(f.placeId)
+            )
+          );           
+        });
+        buildNearbyUserMarkers(userBackdrops).forEach((m) => 
+          markers.add(m)
+        );
+      } else {
+        this.errorMessage = result.errorMessage;
+      }
+    });
+  }
+
+  //Test this, ran out of time to restart into debug mode
+  void getUserBackdrops(LatLng userLocation) async {
+    //Get list of data from firestore using Fluttergeofire query
+    Firestore _firestore = Firestore.instance;
+    GeoFirePoint firePoint = geo.point(latitude: userLocation.latitude, longitude: userLocation.longitude);
+    var collectionReference = _firestore.collection('backdrops');
+    Stream<List<DocumentSnapshot>> stream = geo.collection(collectionRef: collectionReference)
+                                        .within(center: firePoint, radius: 1000, field: 'position');
+    await for (var doc in stream) {
+      userBackdrops.addAll(doc);
+    }
+
+  }
+
+  List<Marker> buildNearbyUserMarkers(Set<DocumentSnapshot> docs) {
+    //Make marker for result from Firestore query
+    List<Marker> userMarkers = new List<Marker>();
+    for (DocumentSnapshot doc in docs) {
+      String geohash = doc.data['position']['geohash'];
+      String id = doc.data['id'];
+      Point geopoint = Geohash.decode(geohash);
+      LatLng markerPosition = LatLng(geopoint.x, geopoint.y);
+      
+      userMarkers.add(
+        Marker(
+          markerId: MarkerId(id),
+          position: markerPosition,
+          infoWindow: InfoWindow(title: 'User Submitted Backdrop'),
+          onTap: () => showUserPhotoBox(id)
+        )
+      );
+    }
+
+    return userMarkers;
   }
   
+  void showUserPhotoBox(String backdropID) {
+    setState(() {
+        _userBackdropId = backdropID;
+        _pressed = false;
+        _userBox = true;
+      });
+  }
+
   void onError(PlacesAutocompleteResponse response) {
     homeScaffoldKey.currentState.showSnackBar(
       SnackBar(content: Text(response.errorMessage)),
@@ -250,15 +318,15 @@ class MapPageState extends State<MapPage> {
     try {
       Prediction p = await PlacesAutocomplete.show(       
           context: context,
-          strictbounds: center == null ? false : true,
+          strictbounds: _center == null ? false : true,
           apiKey: global.kGoogleApiKey,
           onError: onError,
           mode: Mode.overlay,
           language: "en",
-          location: center == null
+          location: _center == null
               ? null
-              : Location(center.latitude, center.longitude),
-          radius: center == null ? null : 3940000);
+              : Location(_center.latitude, _center.longitude),
+          radius: _center == null ? null : 3940000);
 
       PlacesDetailsResponse place = await _places.getDetailsByPlaceId(p.placeId);
       LatLng placeLocation = LatLng(place.result.geometry.location.lat, place.result.geometry.location.lng);

@@ -1,32 +1,54 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class Uploader extends StatefulWidget {
 
   final File file;
+  final LatLng location;
 
-  Uploader({Key key, this.file}) : super(key: key);
+  Uploader({Key key, this.file, this.location}) : super(key: key);
   createState() => _UploaderState();
 }
 
 class _UploaderState extends State<Uploader> {
   final FirebaseStorage _storage = FirebaseStorage(storageBucket: 'gs://backdrop-1563148655138.appspot.com');
-
+  Geoflutterfire geo = Geoflutterfire();
+  var uuid = Uuid();
   StorageUploadTask _uploadTask;
 
   void _startUpload() {
-    String filePath = 'backdrops/${DateTime.now()}.png'; //figure out more intelligent naming
+    final String id = uuid.v1();
+    String filePath = 'backdrops/$id.png'; 
 
+    //Upload to firestore
+    _updateFirestore(id);
+    
     setState(() {
       _uploadTask = _storage.ref().child(filePath).putFile(widget.file);
     });
   }
 
+  Future<void> _updateFirestore(String id) {
+    GeoFirePoint _userLocation = 
+    geo.point(latitude: widget.location.latitude, longitude: widget.location.longitude);
+    return Firestore.instance.runTransaction((Transaction transactionHandler) =>
+       Firestore.instance.collection('backdrops').document().setData({
+        'id': '$id',
+        'position': _userLocation.data
+       })
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_uploadTask != null && !_uploadTask.isComplete) {
+
       return StreamBuilder<StorageTaskEvent>(
         stream: _uploadTask.events,
         builder: (_, snapshot) {
@@ -63,10 +85,6 @@ class _UploaderState extends State<Uploader> {
         color: Colors.white,
         onPressed: _startUpload
       );
-
-
     }
   }
-
-
 }

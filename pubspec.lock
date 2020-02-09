@@ -42,7 +42,7 @@ packages:
       name: cloud_firestore
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.11"
+    version: "0.13.0+1"
   collection:
     dependency: transitive
     description:
@@ -114,10 +114,12 @@ packages:
   flutter_google_places:
     dependency: "direct main"
     description:
-      name: flutter_google_places
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.4+1"
+      path: "."
+      ref: HEAD
+      resolved-ref: "7fb46f08a2056fb4844fe1cd1556b60f1e8314ef"
+      url: "git://github.com/billsakkas/flutter_google_places.git"
+    source: git
+    version: "0.2.4"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -142,6 +144,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  geoflutterfire:
+    dependency: "direct main"
+    description:
+      name: geoflutterfire
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3+8"
+  geohash:
+    dependency: "direct main"
+    description:
+      name: geohash
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.1"
   google_maps_flutter:
     dependency: "direct main"
     description:
@@ -155,7 +171,7 @@ packages:
       name: google_maps_webservice
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.14"
+    version: "0.0.16"
   http:
     dependency: transitive
     description:
@@ -204,7 +220,7 @@ packages:
       name: location
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.1"
+    version: "2.3.5"
   matcher:
     dependency: transitive
     description:
@@ -248,12 +264,12 @@ packages:
     source: hosted
     version: "2.0.5"
   rxdart:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.19.0"
+    version: "0.23.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -308,6 +324,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.6"
+  uuid:
+    dependency: "direct main"
+    description:
+      name: uuid
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.4"
   vector_math:
     dependency: transitive
     description:

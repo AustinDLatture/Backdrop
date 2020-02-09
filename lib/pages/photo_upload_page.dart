@@ -6,8 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PhotoUploadPage extends StatefulWidget {
+  //Make this final?
+  final LatLng location;
+
+  //Constructor for building page from map page
+  PhotoUploadPage({this.location});
+
   @override
   State<StatefulWidget> createState() {
     return PhotoUploadPageState();
@@ -16,8 +23,7 @@ class PhotoUploadPage extends StatefulWidget {
 
 class PhotoUploadPageState extends State<PhotoUploadPage> {
   final homeScaffoldKey = GlobalKey<ScaffoldState>();
-  bool isLoading = false;
-  String errorMessage;
+  LatLng _location;
 
   //Current image file
   File _imageFile;
@@ -53,7 +59,11 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,
       ]);
-    
+
+    if (widget.location != null) {
+      this._location = widget.location;
+    }
+
     return Scaffold(
       key: homeScaffoldKey,
       resizeToAvoidBottomPadding: false,
@@ -109,7 +119,7 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
                             ),
                           ],
                         ),
-                    Uploader(file: _imageFile)
+                    Uploader(file: _imageFile, location: _location)
                   ],
                 )
               )
