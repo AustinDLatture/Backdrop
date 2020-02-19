@@ -62,7 +62,7 @@ class UserPhotoBoxState extends State<UserPhotoBox> {
   }
 
   getImage(String backdropURL) {
-    photosReference.child('$backdropURL.png').getData(1000000).then((data) {
+    photosReference.child('$backdropURL.png').getData(10000000).then((data) {
       this.setState((){
         file = data;
         loading = false;

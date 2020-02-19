@@ -26,12 +26,12 @@ class _UploaderState extends State<Uploader> {
     final String id = uuid.v1();
     String filePath = 'backdrops/$id.png'; 
 
-    //Upload to firestore
-    _updateFirestore(id);
-    
     setState(() {
       _uploadTask = _storage.ref().child(filePath).putFile(widget.file);
     });
+
+    //Upload to firestore
+    _updateFirestore(id);
   }
 
   Future<void> _updateFirestore(String id) {
@@ -71,7 +71,6 @@ class _UploaderState extends State<Uploader> {
                   child: Icon(Icons.pause),
                   onPressed: _uploadTask.pause,
                 ),
-
               LinearProgressIndicator(value:progressPercent),
               Text(
                 '${(progressPercent * 100).toStringAsFixed(2)} %'

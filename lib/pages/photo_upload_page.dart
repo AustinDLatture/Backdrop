@@ -9,7 +9,6 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PhotoUploadPage extends StatefulWidget {
-  //Make this final?
   final LatLng location;
 
   //Constructor for building page from map page

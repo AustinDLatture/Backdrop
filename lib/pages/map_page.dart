@@ -46,6 +46,7 @@ class MapPageState extends State<MapPage> {
   String filterCategory;
   LatLng _center = LatLng(0,0);
   Set<DocumentSnapshot> userBackdrops = new Set();
+  double mapHeightWithBox = .865;
 
   Geoflutterfire geo = Geoflutterfire();
   var uuid = Uuid();
@@ -64,7 +65,7 @@ class MapPageState extends State<MapPage> {
       this.filterCategory = widget.filterCategory;
     }
 
-    if (isLoading) {
+    if (isLoading && _pressed) {
       expandedChild = Center(child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center));
     } else if (errorMessage != null) {
       expandedChild = Center(
@@ -79,15 +80,7 @@ class MapPageState extends State<MapPage> {
           )
         )
       )
-      : new Container(color: global.seafoamGreen, child: 
-        Center(child: 
-          Text(
-            "Welcome to Backdrop",
-            style: TextStyle(fontFamily: "Freight Sans", fontStyle: FontStyle.italic, fontSize: 66, color: Colors.white),
-            textAlign: TextAlign.center
-          )
-        )
-      );
+      : new Container(color: global.seafoamGreen, height: 0);
     }
  
     return Scaffold(
@@ -100,13 +93,6 @@ class MapPageState extends State<MapPage> {
           style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontStyle: FontStyle.italic)
           ),
         actions: <Widget>[
-          IconButton(
-            color: Colors.white,
-            icon: Icon(Icons.search),
-            onPressed: () {
-              _handlePressSearch();
-            },
-          ),
           IconButton(
             color: Colors.white,
             icon: Icon(Icons.add_a_photo),
@@ -122,6 +108,13 @@ class MapPageState extends State<MapPage> {
           ),
           IconButton(
             color: Colors.white,
+            icon: Icon(Icons.search),
+            onPressed: () {
+              _handlePressSearch();
+            },
+          ),
+          /*IconButton(
+            color: Colors.white,
             icon: Icon(Icons.photo_size_select_actual),
             iconSize: 40.0,
             onPressed: () {
@@ -130,29 +123,28 @@ class MapPageState extends State<MapPage> {
               MaterialPageRoute(builder: (context) => CategoriesPage()),
               );
             },
-          ),
+          ), */
         ],
       ),
       body: Column(
         children: <Widget>[
-          Container(            
-            child: SizedBox(            
-                height: (MediaQuery.of(context).size.height)/1.75, //Takes up .5714 of display
-                child: GoogleMap(               
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(target: _center),
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                  markers: markers               
-                    )
-                  ),
-                ),
+          AnimatedContainer(            
+            height: (MediaQuery.of(context).size.height) * mapHeightWithBox, //Takes up .5714 of display         
+            child: GoogleMap(               
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(target: _center),
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              markers: markers               
+              ),
+              duration: Duration(milliseconds:0),
+              curve: Curves.easeIn
+            ),
           _pressed 
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
           : _userBox ? new Builder(builder: (BuildContext context) { return new UserPhotoBox(_userBackdropId); })
             : new SizedBox(),
-          Expanded(child: expandedChild),
-          Container(padding: EdgeInsets.all(10.0), color: global.seafoamGreen)
+          Expanded(child: expandedChild)
         ],
       )
     );
@@ -188,6 +180,7 @@ class MapPageState extends State<MapPage> {
   void showPhotoBox(String placeId) {
     if (placeId != _placeId) {
       setState(() {
+        mapHeightWithBox = .5714;
         _placeId = placeId;
         _pressed = true;
         _userBox = false;
@@ -302,6 +295,7 @@ class MapPageState extends State<MapPage> {
   
   void showUserPhotoBox(String backdropID) {
     setState(() {
+        mapHeightWithBox = .5714;
         _userBackdropId = backdropID;
         _pressed = false;
         _userBox = true;

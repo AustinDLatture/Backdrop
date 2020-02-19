@@ -27,6 +27,7 @@ class PhotoBoxState extends State<PhotoBox> {
   PlacesDetailsResponse place;
   PlaceDetails placeDetails;
   Future<PlacesDetailsResponse> _place;
+  double boxHeight = .2778;
   
   @override
   void initState() {
@@ -52,21 +53,18 @@ class PhotoBoxState extends State<PhotoBox> {
             return new Text('No photos');
           case ConnectionState.waiting:
             return new Container(
-              height: (MediaQuery.of(context).size.height)/3.6,
-              width: MediaQuery.of(context).size.width,
+              height: (MediaQuery.of(context).size.height) * boxHeight,
               child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
             );
           case ConnectionState.active:
             return new Container(
-              height:(MediaQuery.of(context).size.height)/3.6,
-              width: MediaQuery.of(context).size.width,
+              height:(MediaQuery.of(context).size.height) * boxHeight,
               child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
             );
           case ConnectionState.done:
             return new Container(
               color: global.seafoamGreen,
-              height: (MediaQuery.of(context).size.height)/3.6,
-              width: MediaQuery.of(context).size.width,
+              height: (MediaQuery.of(context).size.height) * boxHeight,
               child: Column(
                 children: <Widget>[
                   Expanded(
@@ -101,7 +99,7 @@ class PhotoBoxState extends State<PhotoBox> {
     if (placeDetail.photos != null) {
       final photos = placeDetail.photos;
       list.add(SizedBox(
-          height: (MediaQuery.of(context).size.height)/3.6,
+          height: (MediaQuery.of(context).size.height) * boxHeight,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: photos.length,
@@ -109,7 +107,7 @@ class PhotoBoxState extends State<PhotoBox> {
                 return Padding(
                     padding: EdgeInsets.only(right: 1.0),
                     child: SizedBox(
-                      height: (MediaQuery.of(context).size.height)/3.6,
+                      height: (MediaQuery.of(context).size.height) * boxHeight,
                       child: Image.network(
                           buildPhotoURL(photos[index].photoReference)
                         ),
@@ -120,7 +118,7 @@ class PhotoBoxState extends State<PhotoBox> {
           ); 
     } else {
       list.add(SizedBox(
-          height: (MediaQuery.of(context).size.height)/3.6,
+          height: (MediaQuery.of(context).size.height) * boxHeight,
           child: Container(color: global.seafoamGreen, child: 
             Align(
               alignment: Alignment.center,
