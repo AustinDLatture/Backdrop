@@ -1,9 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:backdrop/global.dart' as global;
 
@@ -54,16 +52,16 @@ class PhotoBoxState extends State<PhotoBox> {
           case ConnectionState.waiting:
             return new Container(
               height: (MediaQuery.of(context).size.height) * boxHeight,
-              child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
+              child: SpinKitWave(color: global.mainPurple, type: SpinKitWaveType.center)
             );
           case ConnectionState.active:
             return new Container(
               height:(MediaQuery.of(context).size.height) * boxHeight,
-              child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
+              child: SpinKitWave(color: global.mainPurple, type: SpinKitWaveType.center)
             );
           case ConnectionState.done:
             return new Container(
-              color: global.seafoamGreen,
+              color: global.mainPurple,
               height: (MediaQuery.of(context).size.height) * boxHeight,
               child: Column(
                 children: <Widget>[
@@ -74,6 +72,7 @@ class PhotoBoxState extends State<PhotoBox> {
               )
             ); 
         }
+        return null;
       }
     );
   }
@@ -119,7 +118,7 @@ class PhotoBoxState extends State<PhotoBox> {
     } else {
       list.add(SizedBox(
           height: (MediaQuery.of(context).size.height) * boxHeight,
-          child: Container(color: global.seafoamGreen, child: 
+          child: Container(color: global.mainPurple, child: 
             Align(
               alignment: Alignment.center,
               child: Text("No photos available :(",

@@ -36,9 +36,9 @@ dependencies:
   image_cropper: ^1.0.2
 
   #FireBase
-  firebase_core: ^0.4.0+9
+  firebase_core: 0.4.4
   firebase_storage: ^3.1.1
-  cloud_firestore: ^0.13.0+1
+  cloud_firestore: ^0.13.4
 
   #GeoFlutterFire:
   geoflutterfire: ^2.0.3+8
@@ -53,6 +53,14 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+
+   #changing launch icon
+  flutter_launcher_icons: ^0.7.4
+
+flutter_icons:
+  image_path: "assets/backdropLauncher.png"
+  android: true
+  ios: true
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +82,9 @@ flutter:
   # assets:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
+
+  assets:
+    - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

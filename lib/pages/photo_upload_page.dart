@@ -38,7 +38,7 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
   Future<void> _cropImage() async {
     File cropped = await ImageCropper.cropImage(
       sourcePath: _imageFile.path,
-      toolbarColor: global.seafoamGreen,
+      toolbarColor: global.mainPurple,
       toolbarWidgetColor: Colors.white,
       toolbarTitle: 'Crop Image'
     );
@@ -67,7 +67,7 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
       key: homeScaffoldKey,
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        backgroundColor: global.seafoamGreen,
+        backgroundColor: global.mainPurple,
         title: const Text(
           "Upload New Backdrop",
           style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontStyle: FontStyle.italic)
@@ -87,7 +87,7 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
           Expanded(
             child: Container(
               width: MediaQuery.of(context).size.width,
-              color: global.seafoamGreen,
+              color: global.mainPurple,
               child: Align(    
                 alignment: Alignment.topCenter,
                 child: Column(

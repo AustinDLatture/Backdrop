@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:backdrop/global.dart' as global;
-import 'package:backdrop/pages/categories_page.dart';
 import 'package:backdrop/pages/photo_upload_page.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
@@ -21,10 +20,6 @@ String placeId;
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: global.kGoogleApiKey);
  
 class MapPage extends StatefulWidget {
-  final String filterCategory;
-  
-  MapPage({this.filterCategory});
-
   @override
   State<StatefulWidget> createState() {
     return MapPageState();
@@ -43,16 +38,32 @@ class MapPageState extends State<MapPage> {
   String _userBackdropId;
   int radius = 1000;
   Set<Marker> markers = {};
-  String filterCategory;
   LatLng _center = LatLng(0,0);
   Set<DocumentSnapshot> userBackdrops = new Set();
   double mapHeightWithBox = .865;
+  BitmapDescriptor defaultPin;
+  BitmapDescriptor userPin;
 
   Geoflutterfire geo = Geoflutterfire();
   var uuid = Uuid();
 
   //for testing
   LatLng gR = new LatLng(42.9634, -85.6681); 
+
+  @override
+  void initState() {
+    super.initState();
+    BitmapDescriptor.fromAssetImage(
+         ImageConfiguration(devicePixelRatio: 2.5),
+         'assets/markerBlue.png').then((onValue) {
+            defaultPin = onValue;
+         });
+    BitmapDescriptor.fromAssetImage(
+         ImageConfiguration(devicePixelRatio: 2.5),
+         'assets/markerPurple.png').then((onValue) {
+            userPin = onValue;
+         });
+  }
  
   @override
   Widget build(BuildContext context) {
@@ -61,33 +72,29 @@ class MapPageState extends State<MapPage> {
         DeviceOrientation.portraitDown,
       ]);
     Widget expandedChild;
-    if (widget.filterCategory != null) {
-      this.filterCategory = widget.filterCategory;
-    }
-
     if (isLoading && _pressed) {
-      expandedChild = Center(child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center));
+      expandedChild = Center(child: SpinKitWave(color: global.mainPurple, type: SpinKitWaveType.center));
     } else if (errorMessage != null) {
       expandedChild = Center(
         child: Text(errorMessage),
       );
     } else {
       expandedChild = _pressed 
-      ? new Container(color: global.seafoamGreen, child: 
+      ? new Container(color: global.mainPurple, child: 
         Center(child: 
           Text(
             ""
           )
         )
       )
-      : new Container(color: global.seafoamGreen, height: 0);
+      : new Container(color: global.mainPurple, height: 0);
     }
  
     return Scaffold(
       key: homeScaffoldKey,
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        backgroundColor: global.seafoamGreen,
+        backgroundColor: global.mainPurple,
         title: const Text(
           "Nearby Backdrops",
           style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontStyle: FontStyle.italic)
@@ -174,50 +181,8 @@ class MapPageState extends State<MapPage> {
     mapController.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
         zoom: 15.0, target: _center)));
     mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _center)));
+    getUserBackdrops(_center);
     getNearbyPlaces(_center);
-  }
-     
-  void showPhotoBox(String placeId) {
-    if (placeId != _placeId) {
-      setState(() {
-        mapHeightWithBox = .5714;
-        _placeId = placeId;
-        _pressed = true;
-        _userBox = false;
-      });
-    }
-  }
-
-  List<PlacesSearchResult> filterByCategory(List<PlacesSearchResult> places, String category) {
-    //Can this be optimized?
-    var placeMap = {
-    'travel': ['airport',  'bus_station', 
-            'campground', 'subway_station”', 
-            'train_station', 'taxi_stand',  
-            'transit_station'],
-    'fun': ['amusement_park', 'bowling alley', 
-          'casino', 'movie_theater', 
-          'night_club', 'spa', 'stadium'],
-    'art': ['art_gallery', 'museum',  'painter'],
-    'food': ['bakery', 'bar', 'cafe', 'restaurant', 'supermarket'],
-    'shopping': ['bicycle_store', 'book_store', 'jewelry_store', 
-          'pet_store',	'clothing_store', 'convenience_store', 
-          'department_store', 'shoe_store', 'electronics_store',
-          'store', 'furniture_store','hardware_store', 'home_goods_store',
-          'shopping_mall'],
-    'architecture': ['city_hall', 'courthouse',  'embassy', 'lodging', 'political'],
-    'nature': ['park',  'florist', 'aquarium', 'zoo']
-    };
-    List<PlacesSearchResult> filteredPlaces = [];
-    List<String> placesCategories = placeMap[category];
-    for (PlacesSearchResult place in places) {
-      for (String category in placesCategories) {
-        if (place.types.contains(category)) {
-          filteredPlaces.add(place);
-        }
-      }
-    }
-    return filteredPlaces;
   }
       
   void getNearbyPlaces(LatLng center) async {
@@ -226,8 +191,6 @@ class MapPageState extends State<MapPage> {
       this.errorMessage = null;
     });
 
-    getUserBackdrops(center);
-     
     final location = Location(center.latitude, center.longitude);
     final result = await _places.searchNearbyWithRadius(location, radius);
     
@@ -235,15 +198,13 @@ class MapPageState extends State<MapPage> {
       this.isLoading = false;
       if (result.status == "OK") {
         this.places = result.results;
-        if(filterCategory != null) {
-          this.places = filterByCategory(this.places, filterCategory);
-        }
         this.places.forEach((f) {
           markers.add(
             Marker(
               markerId: MarkerId(f.placeId),
+              icon: defaultPin,
               position: LatLng(f.geometry.location.lat, f.geometry.location.lng),
-              infoWindow: InfoWindow (title: f.name, snippet: "${f.types?.first}"),
+              infoWindow: InfoWindow (title: f.name),
               onTap: () => showPhotoBox(f.placeId)
             )
           );           
@@ -257,7 +218,6 @@ class MapPageState extends State<MapPage> {
     });
   }
 
-  //Test this, ran out of time to restart into debug mode
   void getUserBackdrops(LatLng userLocation) async {
     //Get list of data from firestore using Fluttergeofire query
     Firestore _firestore = Firestore.instance;
@@ -268,7 +228,6 @@ class MapPageState extends State<MapPage> {
     await for (var doc in stream) {
       userBackdrops.addAll(doc);
     }
-
   }
 
   List<Marker> buildNearbyUserMarkers(Set<DocumentSnapshot> docs) {
@@ -283,6 +242,7 @@ class MapPageState extends State<MapPage> {
       userMarkers.add(
         Marker(
           markerId: MarkerId(id),
+          icon: userPin,
           position: markerPosition,
           infoWindow: InfoWindow(title: 'User Submitted Backdrop'),
           onTap: () => showUserPhotoBox(id)
@@ -293,6 +253,17 @@ class MapPageState extends State<MapPage> {
     return userMarkers;
   }
   
+  void showPhotoBox(String placeId) {
+    if (placeId != _placeId) {
+      setState(() {
+        mapHeightWithBox = .5714;
+        _placeId = placeId;
+        _pressed = true;
+        _userBox = false;
+      });
+    }
+  }
+
   void showUserPhotoBox(String backdropID) {
     setState(() {
         mapHeightWithBox = .5714;
@@ -327,6 +298,7 @@ class MapPageState extends State<MapPage> {
       mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         zoom: 15.0, target: placeLocation)));
       showPhotoBox(p.placeId);
+      getUserBackdrops(placeLocation);
       getNearbyPlaces(placeLocation);
     } catch (e) {
       return;

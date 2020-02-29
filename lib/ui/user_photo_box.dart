@@ -42,7 +42,7 @@ class UserPhotoBoxState extends State<UserPhotoBox> {
   @override
   Widget build(BuildContext context) {
     return new Container(
-      color: global.seafoamGreen,
+      color: global.mainPurple,
       height: (MediaQuery.of(context).size.height)/3.6,
       width: MediaQuery.of(context).size.width,
       child: Column(
@@ -53,7 +53,7 @@ class UserPhotoBoxState extends State<UserPhotoBox> {
               height:(MediaQuery.of(context).size.height)/3.6,
               width: MediaQuery.of(context).size.width,
               color: Colors.white,
-              child: SpinKitWave(color: global.seafoamGreen, type: SpinKitWaveType.center)
+              child: SpinKitWave(color: global.mainPurple, type: SpinKitWaveType.center)
             ),
           )
         ],
@@ -87,7 +87,7 @@ class UserPhotoBoxState extends State<UserPhotoBox> {
     } else {
       list.add(SizedBox(
           height: (MediaQuery.of(context).size.height)/3.6,
-          child: Container(color: global.seafoamGreen, child: 
+          child: Container(color: global.mainPurple, child: 
             Align(
               alignment: Alignment.center,
               child: Text("No photos available :(",
