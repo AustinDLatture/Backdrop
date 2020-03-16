@@ -92,14 +92,14 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
                 alignment: Alignment.topCenter,
                 child: Column(
                   children: <Widget>[
-                        ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          buttonPadding: EdgeInsets.all(40),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
                             IconButton(
                               icon: Icon(Icons.camera, size: 48),
                               color: Colors.white, 
-                              onPressed:() => _pickImage(ImageSource.camera)
+                              onPressed:() => _pickImage(ImageSource.camera),
+                              padding: EdgeInsets.all(8.0)
                             ),
                             IconButton(
                               icon: Icon(Icons.photo_library, size: 48),

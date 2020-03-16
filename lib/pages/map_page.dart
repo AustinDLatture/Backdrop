@@ -15,6 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:geohash/geohash.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 String placeId;
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: global.kGoogleApiKey);
@@ -43,6 +44,7 @@ class MapPageState extends State<MapPage> {
   double mapHeightWithBox = .865;
   BitmapDescriptor defaultPin;
   BitmapDescriptor userPin;
+  String _mapStyle;
 
   Geoflutterfire geo = Geoflutterfire();
   var uuid = Uuid();
@@ -63,6 +65,9 @@ class MapPageState extends State<MapPage> {
          'assets/markerPurple.png').then((onValue) {
             userPin = onValue;
          });
+    rootBundle.loadString('assets/map_theme.txt').then((string) {
+    _mapStyle = string;
+  });
   }
  
   @override
@@ -96,7 +101,7 @@ class MapPageState extends State<MapPage> {
       appBar: AppBar(
         backgroundColor: global.mainPurple,
         title: const Text(
-          "Nearby Backdrops",
+          "Backdrop",
           style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontStyle: FontStyle.italic)
           ),
         actions: <Widget>[
@@ -119,33 +124,20 @@ class MapPageState extends State<MapPage> {
             onPressed: () {
               _handlePressSearch();
             },
-          ),
-          /*IconButton(
-            color: Colors.white,
-            icon: Icon(Icons.photo_size_select_actual),
-            iconSize: 40.0,
-            onPressed: () {
-              Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CategoriesPage()),
-              );
-            },
-          ), */
+          )
         ],
       ),
       body: Column(
         children: <Widget>[
-          AnimatedContainer(            
+          Container(            
             height: (MediaQuery.of(context).size.height) * mapHeightWithBox, //Takes up .5714 of display         
             child: GoogleMap(               
               onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(target: _center),
+              initialCameraPosition: CameraPosition(target: _center, zoom: 17.0),
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
-              markers: markers               
+              markers: markers             
               ),
-              duration: Duration(milliseconds:0),
-              curve: Curves.easeIn
             ),
           _pressed 
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
@@ -159,6 +151,7 @@ class MapPageState extends State<MapPage> {
  
   void _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
+    mapController.setMapStyle(_mapStyle);
     refresh();
   }
   
@@ -178,9 +171,9 @@ class MapPageState extends State<MapPage> {
   void refresh() async {
     _center = await getUserLocation();
     //Workaround to fix iOS Google Maps SDK centering issue
+    Future.delayed(const Duration(milliseconds: 300));
     mapController.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        zoom: 15.0, target: _center)));
-    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _center)));
+        zoom: 17.0, target: _center)));
     getUserBackdrops(_center);
     getNearbyPlaces(_center);
   }

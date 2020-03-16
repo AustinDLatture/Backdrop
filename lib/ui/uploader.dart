@@ -48,7 +48,6 @@ class _UploaderState extends State<Uploader> {
   @override
   Widget build(BuildContext context) {
     if (_uploadTask != null && !_uploadTask.isComplete) {
-
       return StreamBuilder<StorageTaskEvent>(
         stream: _uploadTask.events,
         builder: (_, snapshot) {
@@ -79,10 +78,15 @@ class _UploaderState extends State<Uploader> {
           );
         });
     } else {
-      return IconButton(
-        icon: Icon(Icons.cloud_upload, size: 48),
-        color: Colors.white,
-        onPressed: _startUpload
+      return Expanded(
+        child: Align(
+          child:IconButton(
+            alignment: Alignment.bottomCenter,
+            icon: Icon(Icons.cloud_upload, size: 64),
+            color: Colors.white,
+            onPressed: _startUpload
+          )
+        )
       );
     }
   }
