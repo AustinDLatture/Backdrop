@@ -73,48 +73,48 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
           style: TextStyle(color: Colors.white, fontFamily: "Freight Sans", fontStyle: FontStyle.italic)
         )
       ),
-      body: Column(children: <Widget>[
+      body: Column(
+        children: <Widget>[
           Container(
-            height:(MediaQuery.of(context).size.height)/1.75,
+            height:(MediaQuery.of(context).size.height)/1.4,
             color: Colors.grey[350],
             child: _imageFile != null 
-            ? Image.file(_imageFile, height: (MediaQuery.of(context).size.height)/1.75)
-            : Container(height: (MediaQuery.of(context).size.height)/1.75,
+            ? Image.file(_imageFile, height: (MediaQuery.of(context).size.height)/1.4)
+            : Container(height: (MediaQuery.of(context).size.height)/1.4,
                         width: MediaQuery.of(context).size.width,
                         child: Icon(Icons.add_photo_alternate, size: 150, color: Colors.grey)
                       )
           ),
           Expanded(
             child: Container(
-              width: MediaQuery.of(context).size.width,
               color: global.mainPurple,
               child: Align(    
                 alignment: Alignment.topCenter,
-                child: Column(
+                child: Column( 
                   children: <Widget>[
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             IconButton(
-                              icon: Icon(Icons.camera, size: 48),
+                              icon: Icon(Icons.camera, size: 54),
                               color: Colors.white, 
                               onPressed:() => _pickImage(ImageSource.camera),
                               padding: EdgeInsets.all(8.0)
                             ),
                             IconButton(
-                              icon: Icon(Icons.photo_library, size: 48),
+                              icon: Icon(Icons.photo_library, size: 54),
                               color: Colors.white, 
                               onPressed:() => _pickImage(ImageSource.gallery)
                             ),
                             IconButton(
-                              icon: Icon(Icons.crop, size: 48),
+                              icon: Icon(Icons.crop, size: 54),
                               color: Colors.white, 
-                              onPressed: _cropImage
+                              onPressed: _imageFile != null ? _cropImage : null
                             ),
                             IconButton(
-                              icon: Icon(Icons.clear, size: 48),
+                              icon: Icon(Icons.clear, size: 54),
                               color: Colors.white, 
-                              onPressed: _clear
+                              onPressed: _imageFile != null ? _clear : null
                             ),
                           ],
                         ),

@@ -11,7 +11,7 @@
       "elementType": "labels.text.fill",
       "stylers": [
         {
-          "color": "#fafafa"
+          "color": "#ffffff"
         }
       ]
     },
@@ -78,7 +78,7 @@
       "elementType": "labels.text.fill",
       "stylers": [
         {
-          "color": "#fafafa"
+          "color": "#ffffff"
         }
       ]
     },
@@ -87,7 +87,7 @@
       "elementType": "geometry",
       "stylers": [
         {
-          "color": "#263c3f"
+          "color": "#184a30"
         }
       ]
     },

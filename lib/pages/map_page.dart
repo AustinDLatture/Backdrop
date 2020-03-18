@@ -85,13 +85,7 @@ class MapPageState extends State<MapPage> {
       );
     } else {
       expandedChild = _pressed 
-      ? new Container(color: global.mainPurple, child: 
-        Center(child: 
-          Text(
-            ""
-          )
-        )
-      )
+      ? new Container(color: global.mainPurple)
       : new Container(color: global.mainPurple, height: 0);
     }
  
@@ -107,13 +101,21 @@ class MapPageState extends State<MapPage> {
         actions: <Widget>[
           IconButton(
             color: Colors.white,
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              refresh();
+            }
+          ),
+          IconButton(
+            color: Colors.white,
             icon: Icon(Icons.add_a_photo),
             onPressed: () {
               Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PhotoUploadPage(
-                          location: this._center,
-                      )
+              MaterialPageRoute(builder: (context) => 
+                PhotoUploadPage(
+                      location: this._center,
+                  )
                 )
               );
             },
@@ -135,7 +137,7 @@ class MapPageState extends State<MapPage> {
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(target: _center, zoom: 17.0),
               myLocationEnabled: true,
-              myLocationButtonEnabled: true,
+              myLocationButtonEnabled: false,
               markers: markers             
               ),
             ),
@@ -143,7 +145,7 @@ class MapPageState extends State<MapPage> {
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
           : _userBox ? new Builder(builder: (BuildContext context) { return new UserPhotoBox(_userBackdropId); })
             : new SizedBox(),
-          Expanded(child: expandedChild)
+          Expanded(child:Container(color: global.mainPurple))
         ],
       )
     );

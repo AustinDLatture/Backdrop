@@ -389,7 +389,7 @@ SPEC CHECKSUMS:
   FirebaseFirestore: a23d596ae3a8c13d3b8353b565d2adfb690f9032
   FirebaseInstallations: 575cd32f2aec0feeb0e44f5d0110a09e5e60b47b
   FirebaseStorage: 6c5263796af3b1be82ed173598aade47535fe125
-  Flutter: 446b87ace8a3747a167979213b4aef59a0b5e5fa
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_plugin_android_lifecycle: 47de533a02850f070f5696a623995e93eddcdb9b
   geoflutterfire: 2a6493e01fb6eef1a6c9046b1baf9a943d0c5ffe
   google_maps_flutter: d0dd62f5a7d39bae61057eb9f52dd778d99c7c6c

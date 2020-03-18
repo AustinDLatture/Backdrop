@@ -56,36 +56,39 @@ class _UploaderState extends State<Uploader> {
           double progressPercent = event != null
             ? event.bytesTransferred/event.totalByteCount : 0;
 
-          return Column(children: <Widget>[
-              if (_uploadTask.isComplete)
-                Text('Upload complete'),
-
-              if (_uploadTask.isPaused)
-                FlatButton(child:  Icon(Icons.play_arrow),
-                onPressed: _uploadTask.resume,
-              ),
-
-              if (_uploadTask.isInProgress)
-                FlatButton(
-                  child: Icon(Icons.pause),
-                  onPressed: _uploadTask.pause,
+          return Row(children: <Widget>[
+            Expanded(
+            child:
+              Column(children: <Widget>[
+                if (_uploadTask.isComplete)
+                  FlatButton(child:Icon(Icons.check_circle_outline, color: Colors.white),
+                  onPressed: null),
+                if (_uploadTask.isPaused)
+                  FlatButton(child: Icon(Icons.play_arrow),
+                  onPressed: _uploadTask.resume
                 ),
-              LinearProgressIndicator(value:progressPercent),
-              Text(
-                '${(progressPercent * 100).toStringAsFixed(2)} %'
-              )
-            ]
+
+                if (_uploadTask.isInProgress)
+                  FlatButton(
+                    child: Icon(Icons.pause),
+                    onPressed: _uploadTask.pause
+                  ),
+                LinearProgressIndicator(value:progressPercent),
+                Text(
+                  '${(progressPercent * 100).toStringAsFixed(2)} %'
+                )
+              ]
+            )
+            )
+          ]
           );
         });
     } else {
       return Expanded(
-        child: Align(
-          child:IconButton(
-            alignment: Alignment.bottomCenter,
-            icon: Icon(Icons.cloud_upload, size: 64),
-            color: Colors.white,
-            onPressed: _startUpload
-          )
+        child:IconButton(
+          icon: Icon(Icons.cloud_upload, size: 64),
+          color: Colors.white,
+          onPressed: widget.file != null ? _startUpload : null
         )
       );
     }
