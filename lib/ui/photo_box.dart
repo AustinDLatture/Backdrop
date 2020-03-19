@@ -105,16 +105,15 @@ class PhotoBoxState extends State<PhotoBox> {
               itemBuilder: (context, index) {
                 return Padding(
                     padding: EdgeInsets.only(right: 1.0),
-                    child: SizedBox(
+                    child: 
+                      SizedBox(
                       height: (MediaQuery.of(context).size.height) * boxHeight,
-                      child: Image.network(
-                          buildPhotoURL(photos[index].photoReference)
-                        ),
+                      child: Image.network(buildPhotoURL(photos[index].photoReference)),
                     )
                   );
-              })
-            )
-          ); 
+                })
+              )
+            ); 
     } else {
       list.add(SizedBox(
           height: (MediaQuery.of(context).size.height) * boxHeight,

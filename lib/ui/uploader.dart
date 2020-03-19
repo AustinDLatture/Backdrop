@@ -58,27 +58,26 @@ class _UploaderState extends State<Uploader> {
 
           return Row(children: <Widget>[
             Expanded(
-            child:
-              Column(children: <Widget>[
-                if (_uploadTask.isComplete)
-                  FlatButton(child:Icon(Icons.check_circle_outline, color: Colors.white),
-                  onPressed: null),
-                if (_uploadTask.isPaused)
-                  FlatButton(child: Icon(Icons.play_arrow),
-                  onPressed: _uploadTask.resume
-                ),
-
-                if (_uploadTask.isInProgress)
-                  FlatButton(
-                    child: Icon(Icons.pause),
-                    onPressed: _uploadTask.pause
-                  ),
-                LinearProgressIndicator(value:progressPercent),
-                Text(
-                  '${(progressPercent * 100).toStringAsFixed(2)} %'
+            child: Container(
+              padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*.055),
+              child: Column(children: <Widget>[
+                    if (_uploadTask.isComplete)
+                      FlatButton(child:Icon(Icons.check_circle_outline, color: Colors.white),
+                      onPressed: null),
+                    if (_uploadTask.isPaused)
+                      FlatButton(child: Icon(Icons.play_arrow),
+                      onPressed: _uploadTask.resume
+                    ),
+                    if (_uploadTask.isInProgress)
+                      FlatButton(
+                        child: Icon(Icons.pause),
+                        onPressed: _uploadTask.pause
+                      ),           
+                    LinearProgressIndicator(value:progressPercent),
+                    Text('${(progressPercent * 100).toStringAsFixed(2)} %')
+                  ]
                 )
-              ]
-            )
+              )
             )
           ]
           );

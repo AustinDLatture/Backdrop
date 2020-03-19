@@ -88,41 +88,39 @@ class PhotoUploadPageState extends State<PhotoUploadPage> {
           Expanded(
             child: Container(
               color: global.mainPurple,
-              child: Align(    
-                alignment: Alignment.topCenter,
-                child: Column( 
+              padding: EdgeInsets.only(right: MediaQuery.of(context).size.width*.04),
+              child: Column(
                   children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            IconButton(
-                              icon: Icon(Icons.camera, size: 54),
-                              color: Colors.white, 
-                              onPressed:() => _pickImage(ImageSource.camera),
-                              padding: EdgeInsets.all(8.0)
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.photo_library, size: 54),
-                              color: Colors.white, 
-                              onPressed:() => _pickImage(ImageSource.gallery)
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.crop, size: 54),
-                              color: Colors.white, 
-                              onPressed: _imageFile != null ? _cropImage : null
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.clear, size: 54),
-                              color: Colors.white, 
-                              onPressed: _imageFile != null ? _clear : null
-                            ),
-                          ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.camera, size: 54),
+                          color: Colors.white, 
+                          onPressed:() => _pickImage(ImageSource.camera),
+                          padding: EdgeInsets.all(8.0)
                         ),
+                        IconButton(
+                          icon: Icon(Icons.photo_library, size: 54),
+                          color: Colors.white, 
+                          onPressed:() => _pickImage(ImageSource.gallery)
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.crop, size: 54),
+                          color: Colors.white, 
+                          onPressed: _imageFile != null ? _cropImage : null
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.clear, size: 54),
+                          color: Colors.white, 
+                          onPressed: _imageFile != null ? _clear : null
+                        ),
+                      ],
+                    ),
                     Uploader(file: _imageFile, location: _location)
-                  ],
-                )
+                ],
               )
-            ) 
+            )
           )
         ],
       )
