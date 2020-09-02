@@ -143,7 +143,8 @@ class MapPageState extends State<MapPage> {
             ),
           _pressed 
           ? new Builder(builder: (BuildContext context) { return new PhotoBox(_placeId); }) 
-          : _userBox ? new Builder(builder: (BuildContext context) { return new UserPhotoBox(_userBackdropId); })
+          : _userBox 
+            ? new Builder(builder: (BuildContext context) { return new UserPhotoBox(_userBackdropId); })
             : new SizedBox(),
           Expanded(child:Container(color: global.mainPurple))
         ],
